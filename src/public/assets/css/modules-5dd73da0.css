@@ -4228,7 +4228,7 @@ padding: 3px !important;
   align-items: center;
 }
 .loader_custom_class_header{
-
+display: none !important;
   height: 10vh !important;
 }
 
