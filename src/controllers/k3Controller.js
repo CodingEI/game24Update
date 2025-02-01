@@ -460,6 +460,14 @@ function getRandomElementExcluding(array, targets) {
   return filteredArray[randomIndex];
 }
 
+function getRandomCharacter(char1, char2) {
+  const random_value = Math.random()
+
+  console.log("random_value", random_value)
+  
+  return random_value > 0.7 ? `${char1}` : `${char2}`;
+}
+
 function calculateBetTotals(data) {
   const result = {};
 
@@ -542,17 +550,21 @@ async function funHanding(game) {
 
   // -------------------------- for each join -------------------
   // for big small update
+
   const loose_bet_big_small =
     Object.keys(final_big_small_object)?.length === 1
       ? Object.keys(final_big_small_object)[0]
       : Number(final_big_small_object.b) > Number(final_big_small_object.s)
         ? "b"
         : "s";
-  const filteredWinnerBigSmall = betTypes.bigSmall.filter(
-    (it) => it != loose_bet_big_small,
-  );
+ 
 
-  const winnerBigSmall =
+
+  const filteredWinnerBigSmall = Object.keys(final_big_small_object)?.length !== 0 ? betTypes.bigSmall.filter(
+    (it) => it != loose_bet_big_small,
+  ) : [`${getRandomCharacter('b', 's')}`];
+console.log("filteredWinnerBigSmall", filteredWinnerBigSmall)
+  const winnerBigSmall = 
     filteredWinnerBigSmall[
       Math.floor(Math.random() * filteredWinnerBigSmall.length)
     ];
@@ -570,10 +582,13 @@ async function funHanding(game) {
         ? "c"
         : "l";
   console.log("loose_bet_odd_even---------", loose_bet_odd_even);
+  console.log("final_odd_even_object", final_odd_even_object)
 
-  let filteredWinnerOddEven = betTypes.oddEven.filter(
+  let filteredWinnerOddEven =    Object.keys(final_odd_even_object)?.length !== 0 ?  betTypes.oddEven.filter(
     (it) => it != loose_bet_odd_even,
-  );
+  ): [`${getRandomCharacter('c', 'l')}`];
+
+  console.log("filteredWinnerOddEven", filteredWinnerOddEven)
   let winnerOddEven =
     filteredWinnerOddEven[
       Math.floor(Math.random() * filteredWinnerOddEven.length)
@@ -658,7 +673,7 @@ async function funHanding(game) {
 
     return `${numbers[0]}${numbers[1]}${numbers[2]}`;
   }
-
+console.log("winnerBigSmall", winnerBigSmall,winnerOddEven,  winNumber)
   const result = `${winnerBigSmall},${winnerOddEven},${getThreeNumbers(winNumber)}`;
 
   console.log({ result });

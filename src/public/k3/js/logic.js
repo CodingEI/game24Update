@@ -348,6 +348,7 @@ const displayResultHandler = ({ status, amount, period, result }) => {
 };
 
 function showGameHistoryData(list_orders) {
+  console.log("list_orders...........", list_orders)
   const containerId = ".GameRecord__C .GameRecord__C-body";
 
   displayLast5Result({
@@ -387,7 +388,7 @@ function showGameHistoryData(list_orders) {
                 <span data-v-4e09079f="">${resultSplit[0] == "s" ? "Small" : "Big"}</span>
             </div>
             <div data-v-4e09079f="" class="van-col van-col--4">
-                <span data-v-4e09079f="">${resultSplit[1] === "l" ? "Even" : "Odd"}</span>
+                <span data-v-4e09079f="">${resultSplit[1] === "c" ? "Even" : "Odd"}</span>
             </div>
             <div data-v-4e09079f="" class="van-col van-col--6">
                 <div data-v-4e09079f="" class="GameRecord__C-body-premium">
