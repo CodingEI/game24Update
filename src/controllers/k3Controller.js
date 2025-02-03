@@ -461,11 +461,8 @@ function getRandomElementExcluding(array, targets) {
 }
 
 function getRandomCharacter(char1, char2) {
-  const random_value = Math.random()
-
-  console.log("random_value", random_value)
-  
-  return random_value > 0.7 ? `${char1}` : `${char2}`;
+  const characters = [char1, char2];
+  return characters[Math.floor(Math.random() * characters.length)];
 }
 
 function calculateBetTotals(data) {
@@ -607,7 +604,7 @@ console.log("filteredWinnerBigSmall", filteredWinnerBigSmall)
   let original_final_object = {};
 
   original_final_object = { ...final_number_object };
-  for (let i = 0; i <= 9; i++) {
+  for (let i = 0; i <= 16; i++) {
     const key = i.toString();
     if (!final_number_object.hasOwnProperty(key)) {
       final_number_object[key] = 0; // Initialize missing keys with 0
