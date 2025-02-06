@@ -1015,6 +1015,8 @@ async function plusMoney(game) {
 
       console.log("arr", arr)
       let totalResult = orders.result.split("");
+
+      console.log("totalResult", totalResult)
       let totalResult2 = 0;
       for (let i = 0; i < 3; i++) {
         totalResult2 += Number(totalResult[i]);
@@ -1100,7 +1102,6 @@ async function plusMoney(game) {
           break;
       }
 
-
       const price_win = {
         3: 207.36,
         4: 69.12,
@@ -1119,16 +1120,17 @@ async function plusMoney(game) {
         17: 69.12,
         18: 207.36,
       }
+     console.log("get", get)
 
       if (isNumber(orders.bet)) {
         let fee = orders.money * 0.02;
         let price = orders.money - fee;
-        nhan_duoc += orders.money * get;
+        nhan_duoc += orders.money * price_win[arr[0]];
       } else {
         nhan_duoc += parseFloat(orders.price) * 2;
       }
 console.log("nhan_duoc", nhan_duoc)
-      nhan_duoc += price * get;
+      // nhan_duoc += price * get;
 
       await connection.execute(
         "UPDATE `result_k3` SET `get` = ?, `status` = 1 WHERE `id` = ? ",
