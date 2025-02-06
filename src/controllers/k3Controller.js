@@ -535,7 +535,7 @@ async function funHanding(game) {
     numbers: [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18],
   };
 
-  console.log("number_bet...", number_bet)
+ 
   const final_big_small_object = calculateBetTotals(big_small_bet);
 
   const final_odd_even_object = calculateBetTotals(odd_even_bet);
@@ -543,7 +543,6 @@ async function funHanding(game) {
 
   const final_number_object = calculateBetTotals(number_bet);
 
-  console.log("final_number_object...............", final_number_object);
 
   let win_between_big_or_small;
 
@@ -580,14 +579,12 @@ async function funHanding(game) {
       : Number(final_odd_even_object.c) > Number(final_odd_even_object.l)
         ? "c"
         : "l";
-  console.log("loose_bet_odd_even---------", loose_bet_odd_even);
-  console.log("final_odd_even_object", final_odd_even_object)
+ 
 
   let filteredWinnerOddEven = Object.keys(final_odd_even_object)?.length !== 0 ? betTypes.oddEven.filter(
     (it) => it != loose_bet_odd_even,
   ) : [`${getRandomCharacter('c', 'l')}`];
 
-  console.log("filteredWinnerOddEven", filteredWinnerOddEven)
   let winnerOddEven =
     filteredWinnerOddEven[
     Math.floor(Math.random() * filteredWinnerOddEven.length)
@@ -699,21 +696,29 @@ async function funHanding(game) {
     17: 69.12,
     18: 207.36,
   }
-  console.log("final_number_object", final_number_object)
+  
 
-  if(Object.keys(original_final_object)?.length === 18){
-    console.log("call...")
+  // if(Object.keys(original_final_object)?.length === 16){
+  //   console.log("call...")
 
-    const final_price = final_number_object[winNumber] * price_win[winNumber]
+  //   const final_price = final_number_object[winNumber] * price_win[winNumber]
   
-    console.log("final_price", final_price)
+  //   console.log("final_price", final_price)
+  
+  // console.log("k3Info.period", k3Info.period)
+  // await connection.execute(
+  //   `UPDATE result_k3 
+  //    SET \`get\` = ? 
+  //    WHERE status = ? 
+  //    AND game = ? 
+  //    AND join_bet = ?  
+  //    AND typeGame = ? 
+  //    AND stage = ?`,
+  //   [final_price, '1', game, "1", "total", k3Info.period] // Corrected syntax
+  // );
   
   
-    await connection.execute(
-      `UPDATE result_k3 SET price = ? WHERE status = ? AND game = ? AND join_bet = ?  AND typeGame = ? AND stage = ?`
-      [final_price, '1', game, "1", "total"],
-    );
-  }
+  // }
 
 
   //   if(win_bet.length != 0){
@@ -1007,6 +1012,8 @@ async function plusMoney(game) {
     let result = orders.result;
     if (orders.typeGame == "total") {
       let arr = orders.bet.split(",");
+
+      console.log("arr", arr)
       let totalResult = orders.result.split("");
       let totalResult2 = 0;
       for (let i = 0; i < 3; i++) {
@@ -1019,6 +1026,7 @@ async function plusMoney(game) {
       let lengWin = arr.filter(function (age) {
         return age == totalResult2;
       });
+      console.log("lengWin", lengWin)
 
       let lengWin2 = arr.filter(function (age) {
         return !isNumber(age);
@@ -1092,14 +1100,34 @@ async function plusMoney(game) {
           break;
       }
 
+
+      const price_win = {
+        3: 207.36,
+        4: 69.12,
+        5: 34.56,
+        6: 20.74,
+        7: 13.83,
+        8: 9.88,
+        9: 8.3,
+        10: 7.68,
+        11: 7.68,
+        12: 8.3,
+        13: 9.88,
+        14: 13.83,
+        15: 20.74,
+        16: 34.56,
+        17: 69.12,
+        18: 207.36,
+      }
+
       if (isNumber(orders.bet)) {
         let fee = orders.money * 0.02;
         let price = orders.money - fee;
-        nhan_duoc += orders.money * 9;
+        nhan_duoc += orders.money * get;
       } else {
         nhan_duoc += parseFloat(orders.price) * 2;
       }
-
+console.log("nhan_duoc", nhan_duoc)
       nhan_duoc += price * get;
 
       await connection.execute(
