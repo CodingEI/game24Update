@@ -506,10 +506,11 @@ async function funHanding(game) {
     [0, game, "1", "total", "l", "c"],
   );
   const [number_bet] = await connection.execute(
-    `SELECT * FROM result_k3 WHERE status = ? AND game = ? AND join_bet = ? AND bet IN (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    `SELECT * FROM result_k3 WHERE status = ? AND game = ? AND join_bet = ? AND bet IN (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       0,
       game,
+      "1",
       "3",
       "4",
       "5",
@@ -534,14 +535,15 @@ async function funHanding(game) {
     numbers: [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18],
   };
 
+  console.log("number_bet...", number_bet)
   const final_big_small_object = calculateBetTotals(big_small_bet);
-  console.log("final_big_small_object-------", final_big_small_object);
+
   const final_odd_even_object = calculateBetTotals(odd_even_bet);
-  console.log("final_odd_even_object-------", final_odd_even_object);
+
 
   const final_number_object = calculateBetTotals(number_bet);
 
-  console.log("final_number_object,", final_number_object);
+  console.log("final_number_object...............", final_number_object);
 
   let win_between_big_or_small;
 
@@ -554,18 +556,18 @@ async function funHanding(game) {
       : Number(final_big_small_object.b) > Number(final_big_small_object.s)
         ? "b"
         : "s";
- 
+
 
 
   const filteredWinnerBigSmall = Object.keys(final_big_small_object)?.length !== 0 ? betTypes.bigSmall.filter(
     (it) => it != loose_bet_big_small,
   ) : [`${getRandomCharacter('b', 's')}`];
-console.log("filteredWinnerBigSmall", filteredWinnerBigSmall)
-  const winnerBigSmall = 
+
+  const winnerBigSmall =
     filteredWinnerBigSmall[
-      Math.floor(Math.random() * filteredWinnerBigSmall.length)
+    Math.floor(Math.random() * filteredWinnerBigSmall.length)
     ];
-  console.log("loose_bet_big_small---------", loose_bet_big_small);
+
   await connection.execute(
     `UPDATE result_k3 SET status = 2 WHERE status = ? AND game = ? AND join_bet = ? AND typeGame = ? AND bet = ?`,
     [0, game, "1", "total", loose_bet_big_small],
@@ -581,14 +583,14 @@ console.log("filteredWinnerBigSmall", filteredWinnerBigSmall)
   console.log("loose_bet_odd_even---------", loose_bet_odd_even);
   console.log("final_odd_even_object", final_odd_even_object)
 
-  let filteredWinnerOddEven =    Object.keys(final_odd_even_object)?.length !== 0 ?  betTypes.oddEven.filter(
+  let filteredWinnerOddEven = Object.keys(final_odd_even_object)?.length !== 0 ? betTypes.oddEven.filter(
     (it) => it != loose_bet_odd_even,
-  ): [`${getRandomCharacter('c', 'l')}`];
+  ) : [`${getRandomCharacter('c', 'l')}`];
 
   console.log("filteredWinnerOddEven", filteredWinnerOddEven)
   let winnerOddEven =
     filteredWinnerOddEven[
-      Math.floor(Math.random() * filteredWinnerOddEven.length)
+    Math.floor(Math.random() * filteredWinnerOddEven.length)
     ];
 
   await connection.execute(
@@ -604,13 +606,13 @@ console.log("filteredWinnerBigSmall", filteredWinnerBigSmall)
   let original_final_object = {};
 
   original_final_object = { ...final_number_object };
-  for (let i = 0; i <= 16; i++) {
+  for (let i = 3; i <= 18; i++) {
     const key = i.toString();
     if (!final_number_object.hasOwnProperty(key)) {
-      final_number_object[key] = 0; // Initialize missing keys with 0
+      final_number_object[key] = 0; 
     }
   }
-
+  console.log("original_final_object", original_final_object)
   // console.log("final_number_object",  final_number_object)
   // console.log("original_final_object", original_final_object)
 
@@ -620,12 +622,10 @@ console.log("filteredWinnerBigSmall", filteredWinnerBigSmall)
   let numbersWithEmptyBets = Object.keys(final_number_object).filter(
     (k) => final_number_object[k] === 0,
   );
-
-  console.log({ numbersWithEmptyBets });
   if (numbersWithEmptyBets.length !== 0) {
     winNumber =
       numbersWithEmptyBets[
-        Math.floor(Math.random() * numbersWithEmptyBets.length)
+      Math.floor(Math.random() * numbersWithEmptyBets.length)
       ];
   } else {
     winNumber = Object.keys(final_number_object).reduce((lowest, key) =>
@@ -633,7 +633,9 @@ console.log("filteredWinnerBigSmall", filteredWinnerBigSmall)
     );
   }
 
-  console.log({ winNumber });
+  console.log("winNumber.............", winNumber)
+
+
 
   // for (const bet in final_number_object) {
   //   if (final_number_object[bet] === 0) {
@@ -670,10 +672,64 @@ console.log("filteredWinnerBigSmall", filteredWinnerBigSmall)
 
     return `${numbers[0]}${numbers[1]}${numbers[2]}`;
   }
-console.log("winnerBigSmall", winnerBigSmall,winnerOddEven,  winNumber)
+
   const result = `${winnerBigSmall},${winnerOddEven},${getThreeNumbers(winNumber)}`;
 
-  console.log({ result });
+
+  // checking if the length of the final number object is = 16
+  // then take the win object and update the price feild
+  /**
+   * 
+   */
+  const price_win = {
+    3: 207.36,
+    4: 69.12,
+    5: 34.56,
+    6: 20.74,
+    7: 13.83,
+    8: 9.88,
+    9: 8.3,
+    10: 7.68,
+    11: 7.68,
+    12: 8.3,
+    13: 9.88,
+    14: 13.83,
+    15: 20.74,
+    16: 34.56,
+    17: 69.12,
+    18: 207.36,
+  }
+  console.log("final_number_object", final_number_object)
+
+  if(Object.keys(original_final_object)?.length === 18){
+    console.log("call...")
+
+    const final_price = final_number_object[winNumber] * price_win[winNumber]
+  
+    console.log("final_price", final_price)
+  
+  
+    await connection.execute(
+      `UPDATE result_k3 SET price = ? WHERE status = ? AND game = ? AND join_bet = ?  AND typeGame = ? AND stage = ?`
+      [final_price, '1', game, "1", "total"],
+    );
+  }
+
+
+  //   if(win_bet.length != 0){
+  //     const win_bet_result = win_bet[0] || {};
+  //     console.log("win_bet_result---",win_bet_result)
+  //     const wining_bet = win_bet_result.bet;
+
+  //     // update the feild price
+  //     const updated_price = win_bet_result?.money * price_win[wining_bet];
+
+  //     await connection.execute(
+  //       `UPDATE result_k3 SET price = ? WHERE status = ? AND game = ? AND join_bet = ?  AND typeGame = ? AND stage = ?` 
+  //       [updated_price, '1', game, "1", "total", period],
+  //     );
+  //   }
+
 
   // setting the result
   await connection.execute(
@@ -872,8 +928,8 @@ console.log("winnerBigSmall", winnerBigSmall,winnerOddEven,  winNumber)
  * Fn for handeling 2same result
  * @param {*} game 
  */
-async function funHandingTwoSame(game , join_bet) {
-  console.log("join_bet--",join_bet)
+async function funHandingTwoSame(game, join_bet) {
+
   const [k3] = await connection.query(
     `SELECT * FROM k3 WHERE status = 0 AND game = ${game} ORDER BY id DESC LIMIT 2`,
   );
@@ -883,32 +939,32 @@ async function funHandingTwoSame(game , join_bet) {
   // taking all the number whose status = 0
   const [two_same_number_bet] = await connection.execute(
     `SELECT * FROM result_k3 WHERE status = ? AND game = ? AND join_bet = ? AND bet IN (?, ?, ?, ?, ?, ?)`,
-    [0, game, join_bet , '11@', '22@', '33@', '44@', '55@', '66@']
+    [0, game, join_bet, '11@', '22@', '33@', '44@', '55@', '66@']
   );
-  console.log("two_same_number_bet,", two_same_number_bet);
+
   const final_two_same_number_object = calculateBetTotals(two_same_number_bet);
-  console.log("final_two_same_number_object,", final_two_same_number_object);
+
 
   // loop through this array and check in the original_final_object whether each keys are present if any one of the key is missing then update the status as 2 and if all the keys are present in the final object check through each keys , whick key has the least value win the game with status = 1 and rest as status = 2
   const two_same_number = ['11@', '22@', '33@', '44@', '55@', '66@'];
 
-  const original_final_object = {...final_two_same_number_object}
-  console.log("original_final_object,", original_final_object);
+  const original_final_object = { ...final_two_same_number_object }
+
 
   // Check if all keys exist in original_final_object
   const allKeysExist = two_same_number.every(num => original_final_object.hasOwnProperty(num));
 
   if (!allKeysExist) {
-      console.log("Some keys are missing, updating all to status = 2");
 
-      // If any key is missing, update all with status = 2 and return
-      for (const key of two_same_number) {
-          await connection.execute(
-              `UPDATE result_k3 SET status = 2 WHERE status = ? AND game = ? AND join_bet = ? AND typeGame = ? AND bet = ?`,
-              [0, game, join_bet, 'two-same', key]
-          );
-      }
-      return; // Exit function early
+
+    // If any key is missing, update all with status = 2 and return
+    for (const key of two_same_number) {
+      await connection.execute(
+        `UPDATE result_k3 SET status = 2 WHERE status = ? AND game = ? AND join_bet = ? AND typeGame = ? AND bet = ?`,
+        [0, game, join_bet, 'two-same', key]
+      );
+    }
+    return; // Exit function early
   }
 
   // If all keys exist, find the one with the minimum value
@@ -916,25 +972,25 @@ async function funHandingTwoSame(game , join_bet) {
   let minValue = Infinity;
 
   for (const key of two_same_number) {
-      if (original_final_object[key] < minValue) {
-          minValue = original_final_object[key];
-          minKey = key;
-      }
+    if (original_final_object[key] < minValue) {
+      minValue = original_final_object[key];
+      minKey = key;
+    }
   }
 
-  console.log(`Minimum value key: ${minKey} (Value: ${minValue})`);
+
 
   // Update statuses: minKey -> status = 1, others -> status = 2
   for (const key of two_same_number) {
-      const status = key === minKey ? 1 : 2;
+    const status = key === minKey ? 1 : 2;
 
-      await connection.execute(
-          `UPDATE result_k3 SET status = ? WHERE status = ? AND game = ? AND join_bet = ? AND typeGame = ? AND bet = ?`,
-          [status, 0, game, join_bet, 'two-same', key]
-      );
+    await connection.execute(
+      `UPDATE result_k3 SET status = ? WHERE status = ? AND game = ? AND join_bet = ? AND typeGame = ? AND bet = ?`,
+      [status, 0, game, join_bet, 'two-same', key]
+    );
   }
 
-  console.log("Status updates completed.");
+
 
 }
 
@@ -1240,11 +1296,11 @@ async function plusMoney(game) {
 const handlingK3 = async (typeid) => {
   try {
     let game = Number(typeid);
-    console.log("game---", game)
 
-    
+
+
     await funHanding(game);
-    await funHandingTwoSame(game , 2)
+    await funHandingTwoSame(game, 2)
 
     await plusMoney(game);
   } catch (err) {
