@@ -330,7 +330,6 @@ const listOrderOld = async (req, res) => {
   const [k5d] = await connection.query(
     `SELECT * FROM 5d WHERE status != 0 AND game = '${game}' ORDER BY id DESC LIMIT ${pageno}, ${pageto} `,
   );
-  // console.log("k5d--------", k5d)
   const [k5dAll] = await connection.query(
     `SELECT * FROM 5d WHERE status != 0 AND game = '${game}' `,
   );
@@ -344,7 +343,6 @@ const listOrderOld = async (req, res) => {
   const [records] = await connection.query(
     `SELECT * FROM result_5d WHERE status = 1 AND game = '${game}' ORDER BY id DESC LIMIT 1`
   );
-  console.log("records--------",records)
 
    // Ensure we have at least one record before accessing records[0].stage
    let record;
@@ -586,7 +584,6 @@ for (const join of joins) {
     `SELECT * FROM result_5d WHERE status = ? AND game = ? AND join_bet = ? AND bet IN (?, ?)`,
     [0, game, join, 'b', 's']
   );
-  console.log("big_small_bet", big_small_bet)
   const [odd_even_bet] = await connection.execute(
     `SELECT * FROM result_5d WHERE status = ? AND game = ? AND join_bet = ? AND bet IN (?, ?)`,
     [0, game, join, 'l', 'c']
@@ -599,13 +596,11 @@ for (const join of joins) {
   const final_big_small_object = calculateBetTotals(big_small_bet);
   const final_odd_even_object = calculateBetTotals(odd_even_bet);
   const final_number_object = calculateBetTotals(number_bet);
-  console.log("final_big_small_object", final_big_small_object)
 
   // -------------------------- for each join -------------------
   // for big small update
   const loose_bet_big_small = Object.keys(final_big_small_object)?.length === 1 ? Object.keys(final_big_small_object)[0]  :  (Number(final_big_small_object.b)) > (Number(final_big_small_object.s)) ? 'b' : 's';
 
-console.log("loose_bet_big_small", loose_bet_big_small)
   await connection.execute(
     `UPDATE result_5d SET status = 2 WHERE status = ? AND game = ? AND join_bet = ? AND bet = ?`,
     [0, game, join, loose_bet_big_small]
