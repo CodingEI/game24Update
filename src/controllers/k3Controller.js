@@ -535,6 +535,25 @@ async function funHanding(game) {
     numbers: [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18],
   };
 
+  const price_win = {
+    3: 207.36,
+    4: 69.12,
+    5: 34.56,
+    6: 20.74,
+    7: 13.83,
+    8: 9.88,
+    9: 8.3,
+    10: 7.68,
+    11: 7.68,
+    12: 8.3,
+    13: 9.88,
+    14: 13.83,
+    15: 20.74,
+    16: 34.56,
+    17: 69.12,
+    18: 207.36,
+  }
+
  
   const final_big_small_object = calculateBetTotals(big_small_bet);
 
@@ -619,16 +638,41 @@ async function funHanding(game) {
   let numbersWithEmptyBets = Object.keys(final_number_object).filter(
     (k) => final_number_object[k] === 0,
   );
+  // if (numbersWithEmptyBets.length !== 0) {
+  //   winNumber =
+  //     numbersWithEmptyBets[
+  //     Math.floor(Math.random() * numbersWithEmptyBets.length)
+  //     ];
+  // } else {
+  //   //for all beting present
+  //   winNumber = Object.keys(final_number_object).reduce((lowest, key) =>
+  //     final_number_object[key] < final_number_object[lowest] ? key : lowest,
+  //   );
+  // }
+
   if (numbersWithEmptyBets.length !== 0) {
-    winNumber =
-      numbersWithEmptyBets[
-      Math.floor(Math.random() * numbersWithEmptyBets.length)
-      ];
-  } else {
-    winNumber = Object.keys(final_number_object).reduce((lowest, key) =>
-      final_number_object[key] < final_number_object[lowest] ? key : lowest,
-    );
-  }
+    winNumber = numbersWithEmptyBets[Math.floor(Math.random() * numbersWithEmptyBets.length)];
+} else {
+    // Check if all values in final_number_object are the same
+    const values = Object.values(final_number_object);
+    const allValuesSame = values.every(val => val === values[0]);
+
+    if (allValuesSame) {
+       // Find the minimum value in price_win
+       const minValue = Math.min(...Object.values(price_win));
+
+       // Collect all keys that have the minimum value
+       const tiedKeys = Object.keys(price_win).filter(key => price_win[key] === minValue);
+
+       // Randomly pick one of the tied keys
+       winNumber = tiedKeys[Math.floor(Math.random() * tiedKeys.length)];
+    } else {
+        // If not all values are the same, choose the key with the lowest value in final_number_object
+        winNumber = Object.keys(final_number_object).reduce((lowest, key) =>
+            final_number_object[key] < final_number_object[lowest] ? key : lowest
+        );
+    }
+}
 
   console.log("winNumber.............", winNumber)
 
@@ -678,24 +722,7 @@ async function funHanding(game) {
   /**
    * 
    */
-  const price_win = {
-    3: 207.36,
-    4: 69.12,
-    5: 34.56,
-    6: 20.74,
-    7: 13.83,
-    8: 9.88,
-    9: 8.3,
-    10: 7.68,
-    11: 7.68,
-    12: 8.3,
-    13: 9.88,
-    14: 13.83,
-    15: 20.74,
-    16: 34.56,
-    17: 69.12,
-    18: 207.36,
-  }
+ 
   
 
   // if(Object.keys(original_final_object)?.length === 16){
@@ -1129,8 +1156,6 @@ async function plusMoney(game) {
       } else {
         nhan_duoc += parseFloat(orders.price) * 2;
       }
-console.log("nhan_duoc", nhan_duoc)
-      // nhan_duoc += price * get;
 
       await connection.execute(
         "UPDATE `result_k3` SET `get` = ?, `status` = 1 WHERE `id` = ? ",
