@@ -970,9 +970,8 @@ async function funHanding(game) {
  * @param {*} game 
  */
 async function funHandingTwoSame(game, join_bet, betType) {
-  console.log(`Starting function funHandingTwoSame... Processing: ${betType}`);
 
-  let betList, typeDescription;
+  let betList, typeDescription;  // taking two variable assign with the lest and the first or  second game
 
   if (betType === "first") {
     betList = ['11@', '22@', '33@', '44@', '55@', '66@'];
@@ -984,23 +983,17 @@ async function funHandingTwoSame(game, join_bet, betType) {
     console.log("Invalid betType provided.");
     return;
   }
-
   console.log(`Fetching bets for ${typeDescription}...`);
-
   // Fetch bets with status = 0
   const [betResults] = await connection.execute(
     `SELECT * FROM result_k3 WHERE status = ? AND game = ? AND join_bet = ? AND bet IN (${betList.map(() => '?').join(', ')})`,
     [0, game, join_bet, ...betList]
   );
-
-  console.log(`${typeDescription} - Retrieved bets:`, betResults);
-
   const finalBetObject = calculateBetTotals(betResults);
   console.log(`${typeDescription} - Calculated bet totals:`, finalBetObject);
-
   // Check if all keys exist
   const allKeysExist = betList.every(num => finalBetObject.hasOwnProperty(num));
-
+  // Checking if all the keys were not present
   if (!allKeysExist) {
     console.log(`Missing keys in ${typeDescription}, updating all to status = 2...`);
     for (const key of betList) {
@@ -1011,7 +1004,6 @@ async function funHandingTwoSame(game, join_bet, betType) {
     }
     return;
   }
-
   // Find the key with the minimum value
   let minKey = null;
   let minValue = Infinity;
@@ -1021,9 +1013,7 @@ async function funHandingTwoSame(game, join_bet, betType) {
       minKey = key;
     }
   }
-
   console.log(`Winning bet in ${typeDescription}: ${minKey}, updating statuses...`);
-
   // Update statuses
   for (const key of betList) {
     const status = key === minKey ? 1 : 2;
@@ -1032,7 +1022,6 @@ async function funHandingTwoSame(game, join_bet, betType) {
       [status, 0, game, join_bet, 'two-same', key]
     );
   }
-
   console.log(`${typeDescription} execution completed.`);
 }
 
