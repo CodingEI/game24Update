@@ -969,71 +969,73 @@ async function funHanding(game) {
  * Fn for handeling 2same result
  * @param {*} game 
  */
-async function funHandingTwoSame(game, join_bet) {
+async function funHandingTwoSame(game, join_bet, betType) {
+  console.log(`Starting function funHandingTwoSame... Processing: ${betType}`);
 
-  const [k3] = await connection.query(
-    `SELECT * FROM k3 WHERE status = 0 AND game = ${game} ORDER BY id DESC LIMIT 2`,
+  let betList, typeDescription;
+
+  if (betType === "first") {
+    betList = ['11@', '22@', '33@', '44@', '55@', '66@'];
+    typeDescription = "First Game";
+  } else if (betType === "second") {
+    betList = ['11#@', '22#@', '33#@', '44#@', '55#@', '66#@', '1#@', '2#@', '3#@', '4#@', '5#@', '6#@'];
+    typeDescription = "Second Game";
+  } else {
+    console.log("Invalid betType provided.");
+    return;
+  }
+
+  console.log(`Fetching bets for ${typeDescription}...`);
+
+  // Fetch bets with status = 0
+  const [betResults] = await connection.execute(
+    `SELECT * FROM result_k3 WHERE status = ? AND game = ? AND join_bet = ? AND bet IN (${betList.map(() => '?').join(', ')})`,
+    [0, game, join_bet, ...betList]
   );
-  let k3Info = k3[1];
-  let totalResult, twoSameResult, threeSameResult, unlikeResult;
 
-  // taking all the number whose status = 0
-  const [two_same_number_bet] = await connection.execute(
-    `SELECT * FROM result_k3 WHERE status = ? AND game = ? AND join_bet = ? AND bet IN (?, ?, ?, ?, ?, ?)`,
-    [0, game, join_bet, '11@', '22@', '33@', '44@', '55@', '66@']
-  );
+  console.log(`${typeDescription} - Retrieved bets:`, betResults);
 
-  const final_two_same_number_object = calculateBetTotals(two_same_number_bet);
+  const finalBetObject = calculateBetTotals(betResults);
+  console.log(`${typeDescription} - Calculated bet totals:`, finalBetObject);
 
-
-  // loop through this array and check in the original_final_object whether each keys are present if any one of the key is missing then update the status as 2 and if all the keys are present in the final object check through each keys , whick key has the least value win the game with status = 1 and rest as status = 2
-  const two_same_number = ['11@', '22@', '33@', '44@', '55@', '66@'];
-
-  const original_final_object = { ...final_two_same_number_object }
-
-
-  // Check if all keys exist in original_final_object
-  const allKeysExist = two_same_number.every(num => original_final_object.hasOwnProperty(num));
+  // Check if all keys exist
+  const allKeysExist = betList.every(num => finalBetObject.hasOwnProperty(num));
 
   if (!allKeysExist) {
-
-
-    // If any key is missing, update all with status = 2 and return
-    for (const key of two_same_number) {
+    console.log(`Missing keys in ${typeDescription}, updating all to status = 2...`);
+    for (const key of betList) {
       await connection.execute(
         `UPDATE result_k3 SET status = 2 WHERE status = ? AND game = ? AND join_bet = ? AND typeGame = ? AND bet = ?`,
         [0, game, join_bet, 'two-same', key]
       );
     }
-    return; // Exit function early
+    return;
   }
 
-  // If all keys exist, find the one with the minimum value
+  // Find the key with the minimum value
   let minKey = null;
   let minValue = Infinity;
-
-  for (const key of two_same_number) {
-    if (original_final_object[key] < minValue) {
-      minValue = original_final_object[key];
+  for (const key of betList) {
+    if (finalBetObject[key] < minValue) {
+      minValue = finalBetObject[key];
       minKey = key;
     }
   }
 
+  console.log(`Winning bet in ${typeDescription}: ${minKey}, updating statuses...`);
 
-
-  // Update statuses: minKey -> status = 1, others -> status = 2
-  for (const key of two_same_number) {
+  // Update statuses
+  for (const key of betList) {
     const status = key === minKey ? 1 : 2;
-
     await connection.execute(
       `UPDATE result_k3 SET status = ? WHERE status = ? AND game = ? AND join_bet = ? AND typeGame = ? AND bet = ?`,
       [status, 0, game, join_bet, 'two-same', key]
     );
   }
 
-
-
+  console.log(`${typeDescription} execution completed.`);
 }
+
 
 async function plusMoney(game) {
   const [order] = await connection.execute(
@@ -1364,7 +1366,8 @@ const handlingK3 = async (typeid) => {
 
 
     await funHanding(game);
-    await funHandingTwoSame(game, 2)
+    await funHandingTwoSame(game, 2 , 'first')
+    await funHandingTwoSame(game, 2 , 'second')
 
     await plusMoney(game);
   } catch (err) {
