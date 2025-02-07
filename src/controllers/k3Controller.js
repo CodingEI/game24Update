@@ -169,9 +169,11 @@ const validateBet = async (join, list_join, x, money, game) => {
 };
 
 const betK3 = async (req, res) => {
+  console.log("cal....",req.body)
   try {
     let { listJoin, game, gameJoin, xvalue, money } = req.body;
     let auth = req.cookies.auth;
+   
 
     // let validate = await validateBet(join, list_join, x, money, game);
 
@@ -185,10 +187,12 @@ const betK3 = async (req, res) => {
     const [k3Now] = await connection.query(
       `SELECT period FROM k3 WHERE status = 0 AND game = ${game} ORDER BY id DESC LIMIT 1 `,
     );
+  
     const [user] = await connection.query(
       "SELECT `phone`, `code`, `invite`, `level`, `money` FROM users WHERE token = ? AND veri = 1  LIMIT 1 ",
       [auth],
     );
+    console.log("cal  2222...........", k3Now, user)
     if (k3Now.length < 1 || user.length < 1) {
       return res.status(200).json({
         message: "Error!",
@@ -196,6 +200,7 @@ const betK3 = async (req, res) => {
       });
     }
 
+    console.log("cal  1...........")
     let userInfo = user[0];
     let period = k3Now[0];
 
@@ -295,7 +300,7 @@ const betK3 = async (req, res) => {
     if (gameJoin == 2) typeGame = "two-same";
     if (gameJoin == 3) typeGame = "three-same";
     if (gameJoin == 4) typeGame = "unlike";
-
+    console.log("cal  2...........")
     let check = userInfo.money - total;
     if (check >= 0) {
       let timeNow = Date.now();
@@ -318,6 +323,8 @@ const betK3 = async (req, res) => {
         0,
         timeNow,
       ]);
+
+      console.log("cal  last...........")
       await connection.execute(
         "UPDATE `users` SET `money` = `money` - ? WHERE `token` = ? ",
         [total, auth],
