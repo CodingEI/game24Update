@@ -1002,7 +1002,9 @@ function sendGame2() {
 
    let listJoin2 = join.slice(0, -1)
 
-   let listJoin = listJoin1 + "@" + listJoin2
+   let listJoin = listJoin1 + "#" + listJoin2
+
+   console.log("listJoin", listJoin)
 
    let xvalue = $(".info-bet").attr("xvalue")
    let money = $(".info-bet").attr("money")

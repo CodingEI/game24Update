@@ -1339,7 +1339,9 @@ function initGameLogics({
     }
 
     if (isSame2TabActive) {
+      console.log("bettingValueState.same2", )
       join = bettingValueState.same2.join(",");
+      console.log("join", join)
 
       join += "@";
       gameJoin = 2;
@@ -1501,7 +1503,7 @@ function initGameLogics({
     function (e) {
       e.preventDefault();
       // let value = $(this).attr("data-value");
-      let value = $(this).text().trim();
+      let value = $(this).text().trim() + "#";
       console.log("value", value)
       handleBettingButton({ value, type: BETTING_VALUE_TYPE_MAP.SAME2 });
 
@@ -1517,7 +1519,7 @@ function initGameLogics({
     function (e) {
       e.preventDefault();
       // let value = $(this).attr("data-value");
-      let value = $(this).text().trim();
+      let value = $(this).text().trim() + "#";
       handleBettingButton({ value, type: BETTING_VALUE_TYPE_MAP.SAME2 });
 
       renderResultNumberedList(
