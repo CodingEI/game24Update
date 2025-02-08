@@ -1495,6 +1495,37 @@ function initGameLogics({
       );
     },
   );
+  $(".K3B__C-betting2 .K3B__C-betting2-line2 > div").off("click.betting2");
+  $(".K3B__C-betting2 .K3B__C-betting2-line2 > div").on(
+    "click.betting2",
+    function (e) {
+      e.preventDefault();
+      // let value = $(this).attr("data-value");
+      let value = $(this).text().trim();
+      console.log("value", value)
+      handleBettingButton({ value, type: BETTING_VALUE_TYPE_MAP.SAME2 });
+
+      renderResultNumberedList(
+        ".K3B__C-betting2 .K3B__C-betting2-line2 > div",
+        bettingValueState.same2,
+      );
+    },
+  );
+  $(".K3B__C-betting2 .K3B__C-betting2-line3 > div").off("click.betting2");
+  $(".K3B__C-betting2 .K3B__C-betting2-line3 > div").on(
+    "click.betting2",
+    function (e) {
+      e.preventDefault();
+      // let value = $(this).attr("data-value");
+      let value = $(this).text().trim();
+      handleBettingButton({ value, type: BETTING_VALUE_TYPE_MAP.SAME2 });
+
+      renderResultNumberedList(
+        ".K3B__C-betting2 .K3B__C-betting2-line3 > div",
+        bettingValueState.same2,
+      );
+    },
+  );
   $(".K3B__C-betting3 .K3B__C-betting3-line1 > div").off("click.betting3");
   $(".K3B__C-betting3 .K3B__C-betting3-line1 > div").on(
     "click.betting3",
