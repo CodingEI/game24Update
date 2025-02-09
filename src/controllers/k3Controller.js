@@ -486,7 +486,6 @@ function calculateBetTotals(data) {
       result[bet] = money;
     }
   });
-
   return result;
 }
 
@@ -1025,6 +1024,51 @@ async function funHandingTwoSame(game, join_bet, betType) {
   console.log(`${typeDescription} execution completed.`);
 }
 
+/**
+ * Function for 3 same game
+ * @param {*} game 
+ */
+async function funHandingThreeSame(game, join_bet) {
+  // Fetching bets with status = 0
+  const [three_same_number_bet] = await connection.execute(
+    `SELECT * FROM result_k3 WHERE status = ? AND game = ? AND join_bet = ? AND typeGame = ? AND bet IN (?, ?, ?, ?, ?, ?)`,
+    [0, game, join_bet, 'three-same', "111@", "222@", "333@", "444@", "555@", "666@"]
+  );
+  // Convert result into { '111@': amount, '222@': amount, ... }
+  const finalBetObject = calculateBetTotals(three_same_number_bet);
+  const three_same_numbers = ["111@", "222@", "333@", "444@", "555@", "666@"];
+ // Check if all keys exist
+ const allKeysExist = three_same_numbers.every(num => finalBetObject.hasOwnProperty(num));
+  if (!allKeysExist) {
+    // Update status = 2 for missing bets
+    for (const key of three_same_numbers) {
+      await connection.execute(
+        `UPDATE result_k3 SET status = ? WHERE status = ? AND game = ? AND join_bet = ? AND typeGame = ? AND bet = ?`,
+        [2, 0, game, join_bet, 'three-same', key]
+      );
+    }
+    return; // Exit early
+  }
+  // Find the key with the lowest amount
+  let minKey = null;
+  let minValue = Infinity;
+  for (const key of three_same_numbers) {
+    const value = finalBetObject[key] || 0; // Ensure a default value of 0
+    if (value < minValue) {
+      minValue = value;
+      minKey = key;
+    }
+  }
+  if (!minKey) return; // Failsafe
+  // Update all keys, setting status = 1 for minKey and status = 2 for others
+  for (const key of three_same_numbers) {
+    await connection.execute(
+      `UPDATE result_k3 SET status = ? WHERE status = ? AND game = ? AND join_bet = ? AND typeGame = ? AND bet = ?`,
+      [key === minKey ? 1 : 2, 0, game, join_bet, 'three-same', key]
+    );
+  }
+}
+
 
 async function plusMoney(game) {
   const [order] = await connection.execute(
@@ -1357,6 +1401,7 @@ const handlingK3 = async (typeid) => {
     await funHanding(game);
     await funHandingTwoSame(game, 2 , 'first')
     await funHandingTwoSame(game, 2 , 'second')
+    await funHandingThreeSame(game, 3 )
 
     await plusMoney(game);
   } catch (err) {
