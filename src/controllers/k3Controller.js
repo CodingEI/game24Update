@@ -1028,45 +1028,92 @@ async function funHandingTwoSame(game, join_bet, betType) {
  * Function for 3 same game
  * @param {*} game 
  */
-async function funHandingThreeSame(game, join_bet) {
-  // Fetching bets with status = 0
-  const [three_same_number_bet] = await connection.execute(
-    `SELECT * FROM result_k3 WHERE status = ? AND game = ? AND join_bet = ? AND typeGame = ? AND bet IN (?, ?, ?, ?, ?, ?)`,
-    [0, game, join_bet, 'three-same', "111@", "222@", "333@", "444@", "555@", "666@"]
-  );
-  // Convert result into { '111@': amount, '222@': amount, ... }
-  const finalBetObject = calculateBetTotals(three_same_number_bet);
-  const three_same_numbers = ["111@", "222@", "333@", "444@", "555@", "666@"];
- // Check if all keys exist
- const allKeysExist = three_same_numbers.every(num => finalBetObject.hasOwnProperty(num));
-  if (!allKeysExist) {
-    // Update status = 2 for missing bets
-    for (const key of three_same_numbers) {
-      await connection.execute(
-        `UPDATE result_k3 SET status = ? WHERE status = ? AND game = ? AND join_bet = ? AND typeGame = ? AND bet = ?`,
-        [2, 0, game, join_bet, 'three-same', key]
+async function funHandingThreeSame(game, join_bet, game_type) {
+
+  if('first' === game_type){
+      // Fetching bets with status = 0
+      const [three_same_number_bet] = await connection.execute(
+        `SELECT * FROM result_k3 WHERE status = ? AND game = ? AND join_bet = ? AND typeGame = ? AND bet IN (?, ?, ?, ?, ?, ?)`,
+        [0, game, join_bet, 'three-same', "111@", "222@", "333@", "444@", "555@", "666@"]
       );
-    }
-    return; // Exit early
+      // Convert result into { '111@': amount, '222@': amount, ... }
+      const finalBetObject = calculateBetTotals(three_same_number_bet);
+      const three_same_numbers = ["111@", "222@", "333@", "444@", "555@", "666@"];
+    // Check if all keys exist
+    const allKeysExist = three_same_numbers.every(num => finalBetObject.hasOwnProperty(num));
+      if (!allKeysExist) {
+        // Update status = 2 for missing bets
+        for (const key of three_same_numbers) {
+          await connection.execute(
+            `UPDATE result_k3 SET status = ? WHERE status = ? AND game = ? AND join_bet = ? AND typeGame = ? AND bet = ?`,
+            [2, 0, game, join_bet, 'three-same', key]
+          );
+        }
+        return; // Exit early
+      }
+      // Find the key with the lowest amount
+      let minKey = null;
+      let minValue = Infinity;
+      for (const key of three_same_numbers) {
+        const value = finalBetObject[key] || 0; // Ensure a default value of 0
+        if (value < minValue) {
+          minValue = value;
+          minKey = key;
+        }
+      }
+      if (!minKey) return; // Failsafe
+      // Update all keys, setting status = 1 for minKey and status = 2 for others
+      for (const key of three_same_numbers) {
+        await connection.execute(
+          `UPDATE result_k3 SET status = ? WHERE status = ? AND game = ? AND join_bet = ? AND typeGame = ? AND bet = ?`,
+          [key === minKey ? 0 : 2, 0, game, join_bet, 'three-same', key]
+        );
+      }
+  }else if('second' === game_type){
+     /**
+      * 1. pick the recors from the database where status = 0 
+      * 2. most of the time like 80% of the time the game will loose with status = 2 and 20 % of the time the game will win with status = 1
+      */
+      // Fetch all bets where status = 0
+      const [bets] = await connection.execute(
+        `SELECT bet, amount FROM result_k3 WHERE status = ? AND game = ? AND join_bet = ? AND typeGame = ? AND bet = ?`,
+        [0, game, join_bet, 'three-same', '@3']
+      );
+
+      if (bets.length === 0) return; // No bets to process
+
+      // 80% chance of losing
+      const isLoss = Math.random() < 0.8;
+
+      if (isLoss) {
+        console.log("isloss", isLoss)
+        // Update all bets to status = 2 (loss)
+        for (const bet of bets) {
+          await connection.execute(
+            `UPDATE result_k3 SET status = ? WHERE status = ? AND game = ? AND join_bet = ? AND typeGame = ? AND bet = ?`,
+            [2, 0, game, join_bet, 'three-same', bet.bet]
+          );
+        }
+      } else {
+        console.log("Win callllllllllllllllllllllll")
+        // Find the bet with the least amount
+        let minBet = bets[0]; // Assume first bet is the lowest
+        for (const bet of bets) {
+          if (bet.amount < minBet.amount) {
+            minBet = bet;
+          }
+        }
+        // Update bets: minBet gets status = 1, others get status = 2
+        for (const bet of bets) {
+          const status = bet.bet === minBet.bet ? 1 : 2;
+          await connection.execute(
+            `UPDATE result_k3 SET status = ? WHERE status = ? AND game = ? AND join_bet = ? AND typeGame = ? AND bet = ?`,
+            [status, 0, game, join_bet, 'three-same', bet.bet]
+          );
+        }
+      }
   }
-  // Find the key with the lowest amount
-  let minKey = null;
-  let minValue = Infinity;
-  for (const key of three_same_numbers) {
-    const value = finalBetObject[key] || 0; // Ensure a default value of 0
-    if (value < minValue) {
-      minValue = value;
-      minKey = key;
-    }
-  }
-  if (!minKey) return; // Failsafe
-  // Update all keys, setting status = 1 for minKey and status = 2 for others
-  for (const key of three_same_numbers) {
-    await connection.execute(
-      `UPDATE result_k3 SET status = ? WHERE status = ? AND game = ? AND join_bet = ? AND typeGame = ? AND bet = ?`,
-      [key === minKey ? 0 : 2, 0, game, join_bet, 'three-same', key]
-    );
-  }
+
 }
 
 
@@ -1412,7 +1459,8 @@ const handlingK3 = async (typeid) => {
     await funHanding(game);
     await funHandingTwoSame(game, 2 , 'first')
     await funHandingTwoSame(game, 2 , 'second')
-    await funHandingThreeSame(game, 3 )
+    await funHandingThreeSame(game, 3, 'first' )
+    await funHandingThreeSame(game, 3, 'second')
 
     await plusMoney(game);
   } catch (err) {
