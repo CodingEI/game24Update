@@ -1120,9 +1120,10 @@ async function funHandingThreeSame(game, join_bet, game_type) {
  * Function to generate combination for the k3 different game
  * @returns 
  */
-function generateCombinations() {
-  // Function to generate all combinations of three numbers from 1 to 
+function generateCombinations(game_type) {
   const numbers = [1, 2, 3, 4, 5, 6];
+  if('first' === game_type){
+  // Function to generate all combinations of three numbers from 1 to 
   const combinations = [];
   for (let i = 0; i < numbers.length; i++) {
     for (let j = i + 1; j < numbers.length; j++) {
@@ -1132,70 +1133,165 @@ function generateCombinations() {
     }
   }
   return combinations;
+  }else if('third' === game_type){ // if the game type is third
+    console.log("cal.......................")
+    const combinations = [];
+    for (let i = 0; i < numbers.length; i++) { 
+      for (let j = i + 1; j < numbers.length; j++) {
+        combinations.push(`@y@${numbers[i]},${numbers[j]}`);
+      }
+    }
+    return combinations;  // retun the combination with 2 numbers 
+  }
 }
 
 
-
+// Function for different
 async function funHandingDifferent(game, join_bet, game_type) {
   if ('first' === game_type) {
-    // Generate all combinations
-    const allCombinations = generateCombinations();
-    if (allCombinations.length === 0) return; // No combinations, exit early
-    // Prepare SQL placeholders
-    const placeholders = allCombinations.map(() => '?').join(',');
-    const params = [0, game, join_bet, 'unlike', ...allCombinations];
-    // Fetch relevant bets
-    const query = `
-      SELECT bet, amount FROM result_k3 
-      WHERE status = ? 
-      AND game = ? 
-      AND join_bet = ? 
-      AND typeGame = ? 
-      AND bet IN (${placeholders})
-    `;
-    const [different_number_bet] = await connection.execute(query, params);
-    // Convert result into { 'bet_value': amount }
-    const finalBetObject = calculateBetTotals(different_number_bet);
-    // Check if all keys exist using every()
-    const allKeysExist = allCombinations.every(key => Object.hasOwn(finalBetObject, key));
-    if (!allKeysExist) {  
-      // Update status = 2 for missing bets
+      // Generate all combinations
+      const allCombinations = generateCombinations(game_type);
+      if (allCombinations.length === 0) return; // No combinations, exit early
+      // Prepare SQL placeholders
+      const placeholders = allCombinations.map(() => '?').join(',');
+      const params = [0, game, join_bet, 'unlike', ...allCombinations];
+      // Fetch relevant bets
+      const query = `
+        SELECT * FROM result_k3 
+        WHERE status = ? 
+        AND game = ? 
+        AND join_bet = ? 
+        AND typeGame = ? 
+        AND bet IN (${placeholders})
+      `;
+      const [different_number_bet] = await connection.execute(query, params);
+      // Convert result into { 'bet_value': amount }
+      const finalBetObject = calculateBetTotals(different_number_bet);
+      // Check if all keys exist using every()
+      const allKeysExist = allCombinations.every(key => Object.hasOwn(finalBetObject, key));
+      if (!allKeysExist) {  
+        // Update status = 2 for missing bets
+        for (const key of allCombinations) {
+            if (finalBetObject.hasOwnProperty(key)) {  // Ensure only keys are updated
+                await connection.execute(
+                    `UPDATE result_k3 SET status = ? WHERE status = ? AND game = ? AND join_bet = ? AND typeGame = ? AND bet = ?`,
+                    [2, 0, game, join_bet, 'unlike', key]
+                );
+            }
+        }
+        return; // Exit only after all updates are completed
+    }
+      // Find the key with the lowest amount
+      let minKey = null;
+      let minValue = Infinity;
       for (const key of allCombinations) {
-          if (finalBetObject.hasOwnProperty(key)) {  // Ensure only keys are updated
-              await connection.execute(
-                  `UPDATE result_k3 SET status = ? WHERE status = ? AND game = ? AND join_bet = ? AND typeGame = ? AND bet = ?`,
-                  [2, 0, game, join_bet, 'unlike', key]
-              );
+          const value = finalBetObject[key] || 0; // Default to 0
+          if (value < minValue) {
+              minValue = value;
+              minKey = key;
           }
       }
-  
-      return; // Exit only after all updates are completed
-  }
-
-    // Find the key with the lowest amount
-    let minKey = null;
-    let minValue = Infinity;
-    for (const key of allCombinations) {
-        const value = finalBetObject[key] || 0; // Default to 0
-        if (value < minValue) {
-            minValue = value;
-            minKey = key;
-        }
-    }
-    if (!minKey) return; // Failsafe check
-    // Update all keys, setting status = 0 for minKey and status = 2 for others
-    for (const key of allCombinations) {
+      if (!minKey) return; // Failsafe check
+      // Update all keys, setting status = 0 for minKey and status = 2 for others
+      for (const key of allCombinations) {
+          await connection.execute(
+              `UPDATE result_k3 SET status = ? 
+              WHERE status = ? AND game = ? AND join_bet = ? AND typeGame = ? AND bet = ?`,
+              [key === minKey ? 0 : 2, 0, game, join_bet, 'unlike', key]
+          );
+      }
+  }else if('second' === game_type){
+    /**
+     * 1. pick the recors from the database where status = 0 
+     * 2. most of the time like 80% of the time the game will loose with status = 2 and 20 % of the time the game will win with status = 1
+     */
+    // Fetch all bets where status = 0
+    const [bets] = await connection.execute(
+      `SELECT bet, amount FROM result_k3 WHERE status = ? AND game = ? AND join_bet = ? AND typeGame = ? AND bet = ?`,
+      [0, game, join_bet, 'unlike', '@u@']
+    );
+    console.log("bets----", bets)
+    if (bets.length === 0) return; // No bets to process
+    // 80% chance of losing
+    const isLoss = Math.random() < 0.8;
+    if (isLoss) {
+      // Update all bets to status = 2 (loss)
+      for (const bet of bets) {
         await connection.execute(
-            `UPDATE result_k3 SET status = ? 
-            WHERE status = ? AND game = ? AND join_bet = ? AND typeGame = ? AND bet = ?`,
-            [key === minKey ? 0 : 2, 0, game, join_bet, 'unlike', key]
+          `UPDATE result_k3 SET status = ? WHERE status = ? AND game = ? AND join_bet = ? AND typeGame = ? AND bet = ?`,
+          [2, 0, game, join_bet, 'unlike', bet.bet]
         );
+      }
+    } else {
+      // Find the bet with the least amount
+      let minBet = bets[0]; // Assume first bet is the lowest
+      for (const bet of bets) {
+        if (bet.amount < minBet.amount) {
+          minBet = bet;
+        }
+      }
+      // Update bets: minBet gets status = 1, others get status = 2
+      for (const bet of bets) {
+        const status = bet.bet === minBet.bet ? 1 : 2;
+        await connection.execute(
+          `UPDATE result_k3 SET status = ? WHERE status = ? AND game = ? AND join_bet = ? AND typeGame = ? AND bet = ?`,
+          [status, 0, game, join_bet, 'unlike', bet.bet]
+        );
+      }
     }
-}else if('second' === game_type){
-     // todo need to do the code
+  }else if('third' === game_type){
+      // Generate all combinations
+      const allCombinations = generateCombinations(game_type);
+      if (allCombinations.length === 0) return; // No combinations, exit early
+      // Prepare SQL placeholders
+      const placeholders = allCombinations.map(() => '?').join(',');
+      const params = [0, game, join_bet, 'unlike', ...allCombinations];
+      // Fetch relevant bets
+      const query = `
+        SELECT * FROM result_k3 
+        WHERE status = ? 
+        AND game = ? 
+        AND join_bet = ? 
+        AND typeGame = ? 
+        AND bet IN (${placeholders})
+      `;
+      const [different_number_bet] = await connection.execute(query, params);
+      // Convert result into { 'bet_value': amount }
+      const finalBetObject = calculateBetTotals(different_number_bet);
+      // Check if all keys exist using every()
+      const allKeysExist = allCombinations.every(key => Object.hasOwn(finalBetObject, key));
+      if (!allKeysExist) {
+        // Update status = 2 for missing bets
+        for (const key of allCombinations) {
+            if (finalBetObject.hasOwnProperty(key)) {  // Ensure only keys are updated
+                await connection.execute(
+                    `UPDATE result_k3 SET status = ? WHERE status = ? AND game = ? AND join_bet = ? AND typeGame = ? AND bet = ?`,
+                    [2, 0, game, join_bet, 'unlike', key]
+                );
+            }
+        }
+        return; // Exit only after all updates are completed
+    }
+      // Find the key with the lowest amount
+      let minKey = null;
+      let minValue = Infinity;
+      for (const key of allCombinations) {
+          const value = finalBetObject[key] || 0; // Default to 0
+          if (value < minValue) {
+              minValue = value;
+              minKey = key;
+          }
+      }
+      if (!minKey) return; // Failsafe check
+      // Update all keys, setting status = 0 for minKey and status = 2 for others
+      for (const key of allCombinations) {
+          await connection.execute(
+              `UPDATE result_k3 SET status = ? 
+              WHERE status = ? AND game = ? AND join_bet = ? AND typeGame = ? AND bet = ?`,
+              [key === minKey ? 0 : 2, 0, game, join_bet, 'unlike', key]
+          );
+      }
   }
-
-  
 }
 
 
@@ -1545,6 +1641,8 @@ const handlingK3 = async (typeid) => {
     await funHandingThreeSame(game, 3, 'second')
 
     await funHandingDifferent(game, 4, "first")
+    await funHandingDifferent(game, 4, "second")
+    await funHandingDifferent(game, 4, "third")
 
     await plusMoney(game);
   } catch (err) {
