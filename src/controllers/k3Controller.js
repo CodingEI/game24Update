@@ -1064,19 +1064,23 @@ async function funHandingThreeSame(game, join_bet) {
   for (const key of three_same_numbers) {
     await connection.execute(
       `UPDATE result_k3 SET status = ? WHERE status = ? AND game = ? AND join_bet = ? AND typeGame = ? AND bet = ?`,
-      [key === minKey ? 1 : 2, 0, game, join_bet, 'three-same', key]
+      [key === minKey ? 0 : 2, 0, game, join_bet, 'three-same', key]
     );
   }
 }
 
 
 async function plusMoney(game) {
+  
   const [order] = await connection.execute(
     `SELECT id, phone, bet, price, money, fee, amount, result, typeGame FROM result_k3 WHERE status = 0 AND game = ${game} `,
   );
 
+
   for (let i = 0; i < order.length; i++) {
     let orders = order[i];
+    
+
     let phone = orders.phone;
     let id = orders.id;
     let nhan_duoc = 0;
@@ -1200,7 +1204,7 @@ async function plusMoney(game) {
       } else {
         nhan_duoc += parseFloat(orders.price) * 2;
       }
-console.log("nhan_duoc", nhan_duoc)
+
       await connection.execute(
         "UPDATE `result_k3` SET `get` = ?, `status` = 1 WHERE `id` = ? ",
         [nhan_duoc, id],
@@ -1279,9 +1283,13 @@ console.log("nhan_duoc", nhan_duoc)
       await connection.execute(sql, [nhan_duoc, phone]);
     }
 
+
+    console.log("orders", orders)
     nhan_duoc = 0;
     if (orders.typeGame == "three-same") {
+     
       let kq = result;
+
       let array = orders.bet.split("@");
       let arr1 = array[0].split(",");
       let arr2 = array[1];
@@ -1307,11 +1315,14 @@ console.log("nhan_duoc", nhan_duoc)
           }
         }
         let total = orders.money / (1 + bala) / orders.amount;
-        nhan_duoc += total * 34.56 - orders.fee;
+        console.log("total", total)
+        nhan_duoc += (total * 34.56 - orders.fee) * 2;
       }
+
+      nhan_duoc = (Number(orders.money ?? 0) * Number(orders.amount ?? 0) * 2) - Number(orders.fee ?? 0)
       await connection.execute(
-        "UPDATE `result_k3` SET `get` = ?, `status` = 1 WHERE `id` = ? ",
-        [nhan_duoc, id],
+        "UPDATE `result_k3` SET `get` = ?, `status` = ? WHERE `id` = ? ",
+        [nhan_duoc , 1, id],
       );
       const sql = "UPDATE `users` SET `money` = `money` + ? WHERE `phone` = ? ";
       await connection.execute(sql, [nhan_duoc, phone]);
