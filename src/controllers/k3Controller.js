@@ -1049,18 +1049,18 @@ async function funHandingThreeSame(game, join_bet, game_type) {
     // Find missing keys
     const missingKeys = three_same_numbers.filter(num => !finalBetObject.hasOwnProperty(num)) // missingKeys--- [ '444@', '555@', '666@' ]
       if (missingKeys.length > 0) {
-        // taking the first number
-         const number = missingKeys[0];
+        // Taking the first element
+         const randomGeneratedNumber = missingKeys[0];
         // Pick a random missing key
-        const randomMissingKey = missingKeys[Math.floor(Math.random() * missingKeys.length)];
-        // Extract the numeric part and generate a random number using it
-        const baseNumber = randomMissingKey.replace("@", ""); // Remove '@' symbol
-        // Generate a random three-digit number using the base number
-            let randomGeneratedNumber;
-            do {
-                randomGeneratedNumber = Math.floor(Math.random() * baseNumber);
-            } while (randomGeneratedNumber < 100); // Ensure it's at least 100
-            console.log("randomGeneratedNumber333333333333---", randomGeneratedNumber)
+        // const randomMissingKey = number;
+        // // Extract the numeric part and generate a random number using it
+        // const baseNumber = randomMissingKey.replace("@", ""); // Remove '@' symbol
+        // // Generate a random three-digit number using the base number
+        //     let randomGeneratedNumber;
+        //     do {
+        //         randomGeneratedNumber = Math.floor(Math.random() * baseNumber);
+        //     } while (randomGeneratedNumber < 100); // Ensure it's at least 100
+        //     console.log("randomGeneratedNumber333333333333---", randomGeneratedNumber)
 
         // Update status = 2 for missing bets
         for (const key of three_same_numbers) {
@@ -1088,16 +1088,18 @@ async function funHandingThreeSame(game, join_bet, game_type) {
           }
           if (!minKey) return; // Failsafe
 
+         const randomGeneratedNumber = minKey;
+
           // making a randam number for these minKey to update the result feild 
           // Extract numeric part from minKey
-          const baseNumber = parseInt(minKey.replace("@", ""), 10);
+          // const baseNumber = parseInt(minKey.replace("@", ""), 10);
 
-          // Generate a three-digit random number using baseNumber logic
-          let randomGeneratedNumber;
-          do {
-              randomGeneratedNumber = Math.floor(Math.random() * baseNumber);
-          } while (randomGeneratedNumber < 100 || randomGeneratedNumber > 999); // Ensures a three-digit number
-          console.log("randomGeneratedNumber---", randomGeneratedNumber)
+          // // Generate a three-digit random number using baseNumber logic
+          // let randomGeneratedNumber;
+          // do {
+          //     randomGeneratedNumber = Math.floor(Math.random() * baseNumber);
+          // } while (randomGeneratedNumber < 100 || randomGeneratedNumber > 999); // Ensures a three-digit number
+          // console.log("randomGeneratedNumber---", randomGeneratedNumber)
           // Update all keys, setting status = 1 for minKey and status = 2 for others
           for (const key of three_same_numbers) {
             await connection.execute(
