@@ -1116,6 +1116,57 @@ async function funHandingThreeSame(game, join_bet, game_type) {
 
 }
 
+async function funHandingDifferent(game, join_bet, game_type) {
+
+  
+  if('first' === game_type){
+  // Function to generate all combinations of three numbers from 1 to 6
+function generateCombinations() {
+  const numbers = [1, 2, 3, 4, 5, 6];
+  const combinations = [];
+
+  for (let i = 0; i < numbers.length; i++) {
+    for (let j = i + 1; j < numbers.length; j++) {
+      for (let k = j + 1; k < numbers.length; k++) {
+        combinations.push(`${numbers[i]},${numbers[j]},${numbers[k]}@y@`);
+      }
+    }
+  }
+
+  return combinations;
+}
+
+// Generate all combinations with "@y@" appended
+const allCombinations = generateCombinations();
+
+console.log("allCombinations", allCombinations)
+
+// Flatten the combinations into a single array for the IN clause
+const placeholders = allCombinations.map(() => '?').join(',');
+const params = [0, game, join_bet, 'unlike', ...allCombinations];
+
+// Construct the SQL query dynamically
+const query = `
+  SELECT * FROM result_k3 
+  WHERE status = ? 
+  AND game = ? 
+  AND join_bet = ? 
+  AND typeGame = ? 
+  AND bet IN (${placeholders})
+`;
+
+// Execute the query
+const [different_number_bet] = await connection.execute(query, params);
+
+console.log("different_number_bet", different_number_bet)
+
+  }else if('second' === game_type){
+
+  }
+
+  
+}
+
 
 async function plusMoney(game) {
   
@@ -1461,6 +1512,8 @@ const handlingK3 = async (typeid) => {
     await funHandingTwoSame(game, 2 , 'second')
     await funHandingThreeSame(game, 3, 'first' )
     await funHandingThreeSame(game, 3, 'second')
+
+    await funHandingDifferent(game, 4, "first")
 
     await plusMoney(game);
   } catch (err) {
