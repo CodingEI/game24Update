@@ -1015,7 +1015,7 @@ async function funHandingTwoSame(game, join_bet, betType) {
   console.log(`Winning bet in ${typeDescription}: ${minKey}, updating statuses...`);
   // Update statuses
   for (const key of betList) {
-    const status = key === minKey ? 1 : 2;
+    const status = key === minKey ? 0 : 2;
     await connection.execute(
       `UPDATE result_k3 SET status = ? WHERE status = ? AND game = ? AND join_bet = ? AND typeGame = ? AND bet = ?`,
       [status, 0, game, join_bet, 'two-same', key]
