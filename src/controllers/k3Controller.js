@@ -1565,7 +1565,7 @@ async function plusMoney(game) {
           }
         }
       }
-      nhan_duoc -= orders.fee;
+      nhan_duoc = orders.money * 2;
 
       await connection.execute(
         "UPDATE `result_k3` SET `get` = ?, `status` = 1 WHERE `id` = ? ",
