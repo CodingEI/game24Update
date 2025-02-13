@@ -310,8 +310,8 @@ const displayResultHandler = ({ status, amount, period, result }) => {
   const resultHtml = `
     <div data-v-2d418cc5="" class="line1">
         ${resultSplit[2].split("").map((item) => {
-          return `<div data-v-2d418cc5="" class="n${item}"></div>`;
-        })}
+    return `<div data-v-2d418cc5="" class="n${item}"></div>`;
+  })}
     </div>
     <div data-v-2d418cc5="" class="line2">
         <div data-v-2d418cc5="">${sum}</div>
@@ -347,8 +347,8 @@ const displayResultHandler = ({ status, amount, period, result }) => {
   $("#popup_modal").css("display", "block");
 };
 
-function showGameHistoryData(list_orders) {
-  console.log("list_orders...........", list_orders)
+function showGameHistoryData(list_orders, type = "total") {
+  console.log("list_orders...........", list_orders, type)
   const containerId = ".GameRecord__C .GameRecord__C-body";
 
   displayLast5Result({
@@ -369,14 +369,113 @@ function showGameHistoryData(list_orders) {
   let html = list_orders
     .map((list_order) => {
       const resultSplit = String(list_order.result).split(",");
-      console.log({ resultSplit });
+
+
+      const final_result = list_order.result + "|333,win,361" + "|1,win,4,532";
+      const array_final_result = final_result.split("|")
+
+
+      let result_show_one
+      let result_show_two
+      let result_show_three
+      let result_show_dice
+
+      if (type === "total") {
+        const temp_result = array_final_result[0]
+
+        array_temp_result = temp_result.split(",")
+
+
+        result_show_one = array_temp_result[0];
+        result_show_two = array_temp_result[1];
+        result_show_dice = array_temp_result[2];
+
+      } else if (type === "two-some") {
+        const temp_result = array_final_result[1]
+
+        array_temp_result = temp_result.split(",")
+
+        result_show_one = array_temp_result[0];
+        result_show_two = array_temp_result[1];
+        result_show_dice = array_temp_result[2];
+
+      } else if (type === "three-some") {
+        const temp_result = array_final_result[2]
+
+        array_temp_result = temp_result.split(",")
+
+        result_show_one = array_temp_result[0];
+        result_show_two = array_temp_result[1];
+        result_show_dice = array_temp_result[2];
+
+      } else if (type === "different") {
+        const temp_result = array_final_result[3]
+
+        array_temp_result = temp_result.split(",")
+
+        result_show_one = array_temp_result[0];
+        result_show_two = array_temp_result[1];
+        result_show_three = array_temp_result[2];
+        result_show_dice = array_temp_result[3];
+
+      }
+
+
+      // console.log("result_show_one ==>", result_show_one)
+      // console.log("result_show_two ==>", result_show_two)
+      // console.log("result_show_three ==>", result_show_three)
+      // console.log("result_show_dice ==>", result_show_dice)
 
       const totalString = resultSplit[2];
       console.log("totalString", totalString[0])
       // const totalSum = totalString.reduce(
       //   (prev, total) => parseInt(prev) + parseInt(total),
       // );
-      const sum = totalString.split('').reduce((acc, digit) => acc + Number(digit), 0);
+      const sum = result_show_dice.split('').reduce((acc, digit) => acc + Number(digit), 0);
+
+
+      let typeSpecificHTML = "";
+
+      if (type === "total") {
+        typeSpecificHTML = `
+          <div data-v-4e09079f="" class="van-col van-col--4">
+            <span data-v-4e09079f="">${result_show_one == "s" ? "Small" : "Big"}</span>
+          </div>
+          <div data-v-4e09079f="" class="van-col van-col--4">
+            <span data-v-4e09079f="">${result_show_two === "c" ? "Even" : "Odd"}</span>
+          </div>
+        `;
+      } else if (type === "two-some") {
+        typeSpecificHTML = `
+          <div data-v-4e09079f="" class="van-col van-col--4">
+            <span data-v-4e09079f="">${result_show_one}</span>
+          </div>
+          <div data-v-4e09079f="" class="van-col van-col--4">
+            <span data-v-4e09079f="">${result_show_two}</span>
+          </div>
+        `;
+      } else if (type === "three-some") {
+        typeSpecificHTML = `
+          <div data-v-4e09079f="" class="van-col van-col--4">
+            <span data-v-4e09079f="">${result_show_one}</span>
+          </div>
+          <div data-v-4e09079f="" class="van-col van-col--4">
+            <span data-v-4e09079f="">${result_show_two}</span>
+          </div>
+        `;
+      } else if (type === "different") {
+        typeSpecificHTML = `
+          <div data-v-4e09079f="" class="van-col van-col--2">
+            <span data-v-4e09079f="">${result_show_one}</span>
+          </div>
+          <div data-v-4e09079f="" class="van-col van-col--3">
+            <span data-v-4e09079f="">${result_show_two}</span>
+          </div>
+          <div data-v-4e09079f="" class="van-col van-col--3">
+            <span data-v-4e09079f="">${result_show_three}</span>
+          </div>
+        `;
+      }
 
       return `
           <div data-v-4e09079f="" class="van-row">
@@ -386,17 +485,12 @@ function showGameHistoryData(list_orders) {
             <div data-v-4e09079f="" class="van-col van-col--1">
                 <span data-v-4e09079f="">${sum}</span>
             </div>
-            <div data-v-4e09079f="" class="van-col van-col--4">
-                <span data-v-4e09079f="">${resultSplit[0] == "s" ? "Small" : "Big"}</span>
-            </div>
-            <div data-v-4e09079f="" class="van-col van-col--4">
-                <span data-v-4e09079f="">${resultSplit[1] === "c" ? "Even" : "Odd"}</span>
-            </div>
+            ${typeSpecificHTML}
             <div data-v-4e09079f="" class="van-col van-col--6">
                 <div data-v-4e09079f="" class="GameRecord__C-body-premium">
-                    <div data-v-4e09079f="" class="n${totalString[0]}"></div>
-                    <div data-v-4e09079f="" class="n${totalString[1]}"></div>
-                    <div data-v-4e09079f="" class="n${totalString[2]}"></div>
+                    <div data-v-4e09079f="" class="n${result_show_dice[0]}"></div>
+                    <div data-v-4e09079f="" class="n${result_show_dice[1]}"></div>
+                    <div data-v-4e09079f="" class="n${result_show_dice[2]}"></div>
                 </div>
             </div>
           </div>
@@ -611,20 +705,19 @@ function showMyBetsData(list_orders) {
       if (isSame3TabActive) {
         if (list_order.bet.includes("@3")) {
           selectedHtml = `
-          ${
-            list_order.bet.replace("@3", "").split(",")?.[0] !== ""
+          ${list_order.bet.replace("@3", "").split(",")?.[0] !== ""
               ? `<div data-v-a5ef3154="" class="line1">
             <span data-v-a5ef3154="">3 same numbers:</span>
             ${list_order.bet
-              .replace("@3", "")
-              .split(",")
-              .map((item) => {
-                return `<span data-v-a5ef3154="" class="btn actionViolet">${item}</span>`;
-              })
-              .join(" ")}
+                .replace("@3", "")
+                .split(",")
+                .map((item) => {
+                  return `<span data-v-a5ef3154="" class="btn actionViolet">${item}</span>`;
+                })
+                .join(" ")}
           </div>}`
               : ""
-          }
+            }
           <div data-v-a5ef3154="" class="line1">
             <span data-v-a5ef3154="">Any 3 same numbers:</span>
           </div>
@@ -655,34 +748,32 @@ function showMyBetsData(list_orders) {
           const different2 = list_order.bet.split("@u@")?.[1].split(",");
 
           selectedHtml = `
-            ${
-              different3[0] !== ""
-                ? `
+            ${different3[0] !== ""
+              ? `
                 <div data-v-a5ef3154="" class="line1">
                   <span data-v-a5ef3154="">3 different numbers:</span>
                   ${different3
-                    .map((item) => {
-                      return `<span data-v-a5ef3154="" class="actionViolet">${item}</span>`;
-                    })
-                    .join(" ")}
+                .map((item) => {
+                  return `<span data-v-a5ef3154="" class="actionViolet">${item}</span>`;
+                })
+                .join(" ")}
                 </div>`
-                : ""
+              : ""
             }
             <div data-v-a5ef3154="" class="line1">
               <span data-v-a5ef3154="">3 continuous numbers</span>
             </div>
-            ${
-              different2[0] !== ""
-                ? `
+            ${different2[0] !== ""
+              ? `
                 <div data-v-a5ef3154="" class="line1">
                   <span data-v-a5ef3154="">2 different numbers:</span>
                   ${different2
-                    .map((item) => {
-                      return `<span data-v-a5ef3154="" class="actionViolet">${item}</span>`;
-                    })
-                    .join(" ")}
+                .map((item) => {
+                  return `<span data-v-a5ef3154="" class="actionViolet">${item}</span>`;
+                })
+                .join(" ")}
                 </div>`
-                : ""
+              : ""
             }
             `;
 
@@ -694,31 +785,29 @@ function showMyBetsData(list_orders) {
           const different2 = list_order.bet.split("@y@")?.[1].split(",");
 
           selectedHtml = `
-            ${
-              different3[0] !== ""
-                ? `
+            ${different3[0] !== ""
+              ? `
                 <div data-v-a5ef3154="" class="line1">
                   <span data-v-a5ef3154="">3 different numbers:</span>
                   ${different3
-                    .map((item) => {
-                      return `<span data-v-a5ef3154="" class="actionViolet">${item}</span>`;
-                    })
-                    .join(" ")}
+                .map((item) => {
+                  return `<span data-v-a5ef3154="" class="actionViolet">${item}</span>`;
+                })
+                .join(" ")}
                 </div>`
-                : ""
+              : ""
             }
-            ${
-              different2[0] !== ""
-                ? `
+            ${different2[0] !== ""
+              ? `
                 <div data-v-a5ef3154="" class="line1">
                   <span data-v-a5ef3154="">2 different numbers:</span>
                   ${different2
-                    .map((item) => {
-                      return `<span data-v-a5ef3154="" class="actionViolet">${item}</span>`;
-                    })
-                    .join(" ")}
+                .map((item) => {
+                  return `<span data-v-a5ef3154="" class="actionViolet">${item}</span>`;
+                })
+                .join(" ")}
                 </div>`
-                : ""
+              : ""
             }
             `;
 
@@ -739,14 +828,13 @@ function showMyBetsData(list_orders) {
                 <div data-v-a5ef3154="" class="MyGameRecordList__C-item-m-top">${list_order.stage}</div>
                 <div data-v-a5ef3154="" class="MyGameRecordList__C-item-m-bottom">${timerJoin(list_order.time)}</div>
             </div>
-             ${
-               list_order.status !== 0
-                 ? `<div data-v-a5ef3154="" class="MyGameRecordList__C-item-r ${list_order.status == 1 ? "success" : "red"}">
+             ${list_order.status !== 0
+          ? `<div data-v-a5ef3154="" class="MyGameRecordList__C-item-r ${list_order.status == 1 ? "success" : "red"}">
                       <div data-v-a5ef3154="" class="${list_order.status === 1 ? "success" : ""}">${list_order.status == 1 ? "Success" : "Failed"}</div>
                       <span data-v-a5ef3154="" class="${list_order.status === 1 ? "success" : ""}">${list_order.status === 1 ? `+${Number(list_order.get).toFixed(2)}` : `-${Number(list_order.price).toFixed(2)}`}</span>
                     </div>`
-                 : ""
-             }
+          : ""
+        }
         </div>
 
         <div data-v-a5ef3154="" class="MyGameRecordList__C-detail details_box_${index}" style="display: none">
@@ -773,11 +861,11 @@ function showMyBetsData(list_orders) {
                 Result 
                 <div data-v-a5ef3154="" class="numList">
                 ${list_order.result
-                  .split("")
-                  .map((num) => {
-                    return `<div data-v-a5ef3154="" class="n${num}"></div>`;
-                  })
-                  .join(" ")}
+          .split("")
+          .map((num) => {
+            return `<div data-v-a5ef3154="" class="n${num}"></div>`;
+          })
+          .join(" ")}
                 </div>
           </div>
           <div data-v-a5ef3154="" class="MyGameRecordList__C-detail-line noLine"  style="display:${list_order.status == 0 ? "none" : ""};">
@@ -850,10 +938,18 @@ function initGameLogics({
     }
   };
 
+  let activeTab = "total";
+  function handleTabClick(tabName) {
+    activeTab = tabName;
+   
+  }
+
   $("#total_bet_tab_btn").off("click.total_bet_tab_btn");
   $("#total_bet_tab_btn").on("click.total_bet_tab_btn", function (e) {
     e.preventDefault();
     setActiveBetTab(BET_TAB_MAP.TOTAL);
+    initGameHistoryTab(1, "total")
+    handleTabClick("total")
     bettingPopupClose();
     cleanBettingValueState();
     $(this).siblings().removeClass("active");
@@ -864,6 +960,8 @@ function initGameLogics({
   $("#same_2_bet_tab_btn").on("click.same_2_bet_tab_btn", function (e) {
     e.preventDefault();
     setActiveBetTab(BET_TAB_MAP.SAME_2);
+    initGameHistoryTab(1, "two-some")
+    handleTabClick("two-some")
     bettingPopupClose();
     cleanBettingValueState();
     $(this).siblings().removeClass("active");
@@ -874,6 +972,8 @@ function initGameLogics({
   $("#same_3_bet_tab_btn").on("click.same_3_bet_tab_btn", function (e) {
     e.preventDefault();
     setActiveBetTab(BET_TAB_MAP.SAME_3);
+    initGameHistoryTab(1, "three-some")
+    handleTabClick("three-some")
     bettingPopupClose();
     cleanBettingValueState();
     $(this).siblings().removeClass("active");
@@ -884,6 +984,8 @@ function initGameLogics({
   $("#different_bet_tab_btn").on("click.different_bet_tab_btn", function (e) {
     e.preventDefault();
     setActiveBetTab(BET_TAB_MAP.DIFFERENT);
+    initGameHistoryTab(1, "different")
+    handleTabClick("different")
     bettingPopupClose();
     cleanBettingValueState();
     $(this).siblings().removeClass("active");
@@ -1341,7 +1443,7 @@ function initGameLogics({
     }
 
     if (isSame2TabActive) {
-      console.log("bettingValueState.same2", )
+      console.log("bettingValueState.same2",)
       join = bettingValueState.same2.join(",");
       console.log("join", join)
 
@@ -1638,7 +1740,8 @@ function initGameLogics({
 
   // -------------------------- game pagination -----------------------
 
-  const initGameHistoryTab = (page = 1) => {
+  const initGameHistoryTab = (page = 1, type) => {
+    console.log("calll............", type)
     let size = 10;
     let offset = page === 1 ? 0 : (page - 1) * size;
     let limit = page * size;
@@ -1666,11 +1769,11 @@ function initGameLogics({
 
         loading.hide();
 
-        showGameHistoryData(list_orders);
+        showGameHistoryData(list_orders, type);
       },
     });
   };
-  initGameHistoryTab();
+  initGameHistoryTab(1, activeTab);
 
   const initChartTab = (page = 1) => {
     let size = 10;
