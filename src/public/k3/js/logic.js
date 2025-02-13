@@ -371,10 +371,12 @@ function showGameHistoryData(list_orders) {
       const resultSplit = String(list_order.result).split(",");
       console.log({ resultSplit });
 
-      const totalString = resultSplit[2].split("");
-      const totalSum = totalString.reduce(
-        (prev, total) => parseInt(prev) + parseInt(total),
-      );
+      const totalString = resultSplit[2];
+      console.log("totalString", totalString[0])
+      // const totalSum = totalString.reduce(
+      //   (prev, total) => parseInt(prev) + parseInt(total),
+      // );
+      const sum = totalString.split('').reduce((acc, digit) => acc + Number(digit), 0);
 
       return `
           <div data-v-4e09079f="" class="van-row">
@@ -382,7 +384,7 @@ function showGameHistoryData(list_orders) {
                 ${list_order.period}
             </div>
             <div data-v-4e09079f="" class="van-col van-col--1">
-                <span data-v-4e09079f="">${totalSum}</span>
+                <span data-v-4e09079f="">${sum}</span>
             </div>
             <div data-v-4e09079f="" class="van-col van-col--4">
                 <span data-v-4e09079f="">${resultSplit[0] == "s" ? "Small" : "Big"}</span>

@@ -1029,13 +1029,6 @@ async function funHandingTwoSame(game, join_bet, betType) {
  * @param {*} game 
  */
 async function funHandingThreeSame(game, join_bet, game_type) {
-  // getting the period 
-  const [k3] = await connection.query(
-    `SELECT * FROM k3 WHERE status = 1 AND game = ${game} ORDER BY id DESC LIMIT 2`,
-  );
-
-  let k3Info = k3[0];
-  let totalResult, twoSameResult, threeSameResult, unlikeResult;
 
   if('first' === game_type){
       // Fetching bets with status = 0
@@ -1046,74 +1039,36 @@ async function funHandingThreeSame(game, join_bet, game_type) {
       // Convert result into { '111@': amount, '222@': amount, ... }
       const finalBetObject = calculateBetTotals(three_same_number_bet);
       const three_same_numbers = ["111@", "222@", "333@", "444@", "555@", "666@"];
-    // Find missing keys
-    const missingKeys = three_same_numbers.filter(num => !finalBetObject.hasOwnProperty(num)) // missingKeys--- [ '444@', '555@', '666@' ]
-      if (missingKeys.length > 0) {
-        // Taking the first element
-         const randomGeneratedNumber = missingKeys[0];
-        // Pick a random missing key
-        // const randomMissingKey = number;
-        // // Extract the numeric part and generate a random number using it
-        // const baseNumber = randomMissingKey.replace("@", ""); // Remove '@' symbol
-        // // Generate a random three-digit number using the base number
-        //     let randomGeneratedNumber;
-        //     do {
-        //         randomGeneratedNumber = Math.floor(Math.random() * baseNumber);
-        //     } while (randomGeneratedNumber < 100); // Ensure it's at least 100
-        //     console.log("randomGeneratedNumber333333333333---", randomGeneratedNumber)
-
+    // Check if all keys exist
+    const allKeysExist = three_same_numbers.every(num => finalBetObject.hasOwnProperty(num));
+      if (!allKeysExist) {
         // Update status = 2 for missing bets
         for (const key of three_same_numbers) {
           await connection.execute(
-            `UPDATE result_k3 SET status = ? , result = ? WHERE status = ? AND game = ? AND join_bet = ? AND typeGame = ? AND bet = ?`,
-            [2,randomGeneratedNumber, 0, game, join_bet, 'three-same', key]
+            `UPDATE result_k3 SET status = ? WHERE status = ? AND game = ? AND join_bet = ? AND typeGame = ? AND bet = ?`,
+            [2, 0, game, join_bet, 'three-same', key]
           );
         }
-        console.log("randomGeneratedNumber444444444444--", randomGeneratedNumber)
-
-        await connection.execute(`UPDATE k3 SET result = ? WHERE id = ?`, [
-          randomGeneratedNumber,
-          k3Info.id,
-        ]);
-      }else{
-           // Find the key with the lowest amount
-          let minKey = null;
-          let minValue = Infinity;
-          for (const key of three_same_numbers) {
-            const value = finalBetObject[key] || 0; // Ensure a default value of 0
-            if (value < minValue) {
-              minValue = value;
-              minKey = key;
-            }
-          }
-          if (!minKey) return; // Failsafe
-
-         const randomGeneratedNumber = minKey;
-
-          // making a randam number for these minKey to update the result feild 
-          // Extract numeric part from minKey
-          // const baseNumber = parseInt(minKey.replace("@", ""), 10);
-
-          // // Generate a three-digit random number using baseNumber logic
-          // let randomGeneratedNumber;
-          // do {
-          //     randomGeneratedNumber = Math.floor(Math.random() * baseNumber);
-          // } while (randomGeneratedNumber < 100 || randomGeneratedNumber > 999); // Ensures a three-digit number
-          // console.log("randomGeneratedNumber---", randomGeneratedNumber)
-          // Update all keys, setting status = 1 for minKey and status = 2 for others
-          for (const key of three_same_numbers) {
-            await connection.execute(
-              `UPDATE result_k3 SET status = ? , result = ? WHERE status = ? AND game = ? AND join_bet = ? AND typeGame = ? AND bet = ?`,
-              [key === minKey ? 0 : 2,randomGeneratedNumber, 0, game, join_bet, 'three-same', key]
-            );
-          }
-          // update the k3 table reult feild
-          await connection.execute(`UPDATE k3 SET result = ? WHERE id = ?`, [
-            randomGeneratedNumber,
-            k3Info.id,
-          ]);
+        return; // Exit early
       }
-     
+      // Find the key with the lowest amount
+      let minKey = null;
+      let minValue = Infinity;
+      for (const key of three_same_numbers) {
+        const value = finalBetObject[key] || 0; // Ensure a default value of 0
+        if (value < minValue) {
+          minValue = value;
+          minKey = key;
+        }
+      }
+      if (!minKey) return; // Failsafe
+      // Update all keys, setting status = 1 for minKey and status = 2 for others
+      for (const key of three_same_numbers) {
+        await connection.execute(
+          `UPDATE result_k3 SET status = ? WHERE status = ? AND game = ? AND join_bet = ? AND typeGame = ? AND bet = ?`,
+          [key === minKey ? 0 : 2, 0, game, join_bet, 'three-same', key]
+        );
+      }
   }else if('second' === game_type){
      /**
       * 1. pick the recors from the database where status = 0 
