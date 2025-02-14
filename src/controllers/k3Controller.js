@@ -839,7 +839,7 @@ async function funHandingTwoSame(game, join_bet, betType) {
   let isSecondGame = betType === "second";
 
   if (missingKeys.length > 0) {
-    const win = missingKeys[0];
+    const win = missingKeys[Math.floor(Math.random() * missingKeys.length)];
     const winNumber = win.replace(/[@#]/g, ''); // Extract numeric part properly
 
     // Append the new number while preserving format
@@ -930,8 +930,8 @@ async function funHandingThreeSame(game, join_bet, game_type) {
     let updatedResult = k3Info.result;
 
     if (missingKeys.length > 0) {
-        const win = missingKeys[0];
-        const winNumber = win.replace(/[@#]/g, ''); // Extract numeric part properly
+      const win = missingKeys[Math.floor(Math.random() * missingKeys.length)];
+      const winNumber = win.replace(/[@#]/g, ''); // Extract numeric part properly
     
         // Append the winNumber correctly to maintain format
         if (updatedResult.endsWith(",")) {
@@ -1115,7 +1115,7 @@ async function funHandingDifferent(game, join_bet, game_type) {
       console.log("missingKeys444444444-", missingKeys)
       let updatedResult = k3Info.result;
       if (missingKeys.length > 0) {  
-        const win = missingKeys[0];
+        const win = missingKeys[Math.floor(Math.random() * missingKeys.length)];
         const winNumber = win.replace(/[^0-9]/g, ''); // Remove everything except digits
     
         // Append the new number while preserving format
@@ -1301,7 +1301,7 @@ async function funHandingDifferent(game, join_bet, game_type) {
       let updatedResult = k3Info.result;
       if (missingKeys.length > 0) {
 
-        const win = missingKeys[0];
+        const win = missingKeys[Math.floor(Math.random() * missingKeys.length)];
         const winNumber = win.replace(/[^0-9]/g, '');
 
         // Append the new number while preserving format
