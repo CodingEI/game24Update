@@ -393,7 +393,7 @@ function showGameHistoryData(list_orders, type = "total") {
       } else if (type === "two-some") {
         const temp_result = array_final_result[1]
 
-        array_temp_result = temp_result.split(",")
+        array_temp_result = temp_result.split(",") 
 
         result_show_one = array_temp_result[0];
         result_show_two = array_temp_result[1];
