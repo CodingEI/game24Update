@@ -427,7 +427,7 @@ function showGameHistoryData(list_orders, type = "total") {
       // console.log("result_show_dice ==>", result_show_dice)
 
       const totalString = resultSplit[2];
-      console.log("totalString", totalString[0])
+     
       // const totalSum = totalString.reduce(
       //   (prev, total) => parseInt(prev) + parseInt(total),
       // );
@@ -501,7 +501,8 @@ function showGameHistoryData(list_orders, type = "total") {
   $(containerId).html(html);
 }
 
-function showTrendData(list_orders) {
+function showTrendData(list_orders, activeTab) {
+  console.log("activeTab", activeTab)
   const containerId = ".Trend__C .Trend__C-body";
 
   if (list_orders.length == 0) {
@@ -516,39 +517,37 @@ function showTrendData(list_orders) {
 
   const html = list_orders
     .map((order, index) => {
-      const resultSplit = String(order.result).split(",");
+      const resultSplit = String(order.result).split("|");
+      // console.log("resultSplit", resultSplit)
+
+      const dice_get = resultSplit[0].split(",")[2] 
+
+      console.log("dice_gate", dice_get)
 
       let NumberText = "";
 
-      const is3Different = new Set(resultSplit).size === 3;
-      const is2Same = new Set(resultSplit).size === 2;
-      const is3Same = new Set(resultSplit).size === 1;
-
-      const resultSplitAscending = resultSplit.sort((a, b) => a - b);
-
-      const is3Consecutive =
-        resultSplitAscending[2] - resultSplitAscending[0] === 2;
-
-      if (is3Same) {
+      if ("three-some" === activeTab) {
         NumberText = "3 same numbers";
-      } else if (is2Same) {
+      } else if ("two-some" === activeTab) {
         NumberText = "2 same numbers";
-      } else if (is3Consecutive) {
-        NumberText = "3 consecutive numbers";
-      } else if (is3Different) {
-        NumberText = "3 different numbers";
+      } else if ("different" === activeTab) {
+        NumberText = "Different";
+      } else if("total" === activeTab){
+        NumberText = "Total";
       } else {
-        NumberText = "";
+        NumberText = "Total";
       }
+
+      console.log("NumberText", NumberText)
 
       return `
         <div data-v-4159c83a="" class="van-row">
           <div data-v-4159c83a="" class="van-col van-col--8">${order.period}</div>
           <div data-v-4159c83a="" class="van-col van-col--6">
               <div data-v-4159c83a="" class="Trend__C-body-premium">
-                  <div data-v-4159c83a="" class="n${resultSplit[2]}"></div>
-                  <div data-v-4159c83a="" class="n${resultSplit[3]}"></div>
-                  <div data-v-4159c83a="" class="n${resultSplit[4]}"></div>
+                  <div data-v-4159c83a="" class="n${dice_get[0]}"></div>
+                  <div data-v-4159c83a="" class="n${dice_get[1]}"></div>
+                  <div data-v-4159c83a="" class="n${dice_get[2]}"></div>
               </div>
           </div>
           <div data-v-4159c83a="" class="van-col van-col--10">
@@ -944,11 +943,14 @@ function initGameLogics({
    
   }
 
+  console.log("activeTab", activeTab)
+
   $("#total_bet_tab_btn").off("click.total_bet_tab_btn");
   $("#total_bet_tab_btn").on("click.total_bet_tab_btn", function (e) {
     e.preventDefault();
     setActiveBetTab(BET_TAB_MAP.TOTAL);
     initGameHistoryTab(1, "total")
+    initChartTab(1, activeTab)
     handleTabClick("total")
     bettingPopupClose();
     cleanBettingValueState();
@@ -961,6 +963,7 @@ function initGameLogics({
     e.preventDefault();
     setActiveBetTab(BET_TAB_MAP.SAME_2);
     initGameHistoryTab(1, "two-some")
+    initChartTab(1, activeTab)
     handleTabClick("two-some")
     bettingPopupClose();
     cleanBettingValueState();
@@ -974,6 +977,7 @@ function initGameLogics({
     setActiveBetTab(BET_TAB_MAP.SAME_3);
     initGameHistoryTab(1, "three-some")
     handleTabClick("three-some")
+    initChartTab(1, activeTab)
     bettingPopupClose();
     cleanBettingValueState();
     $(this).siblings().removeClass("active");
@@ -986,6 +990,7 @@ function initGameLogics({
     setActiveBetTab(BET_TAB_MAP.DIFFERENT);
     initGameHistoryTab(1, "different")
     handleTabClick("different")
+    initChartTab(1, activeTab)
     bettingPopupClose();
     cleanBettingValueState();
     $(this).siblings().removeClass("active");
@@ -1803,7 +1808,7 @@ function initGameLogics({
 
         loading.hide();
 
-        showTrendData(list_orders);
+        showTrendData(list_orders, activeTab);
       },
     });
   };
@@ -2337,13 +2342,15 @@ function handleMyEmerdList() {
   });
 }
 let GAME_TYPE = getGameType();
+activeTab="total"
 
 var pageno = 0;
 var limit = 10;
 var page = 1;
 socket.on("data-server-k3", async function (msg) {
-  console.log({ msg });
-  console.log("cal.....................1111111111111111111");
+
+  console.log("activeTab", activeTab)
+
   try {
     GAME_TYPE_ID = getGameType();
 
@@ -2351,7 +2358,6 @@ socket.on("data-server-k3", async function (msg) {
     console.log(GAME_NAME);
 
     if (msg.data[0].game != GAME_TYPE_ID) {
-      console.log("cal 444444444444444");
       return;
     }
 
@@ -2449,7 +2455,7 @@ socket.on("data-server-k3", async function (msg) {
     });
 
     showGameHistoryData(gameListData);
-    showTrendData(gameListData);
+    showTrendData(gameListData, "total");
     showMyBetsData(betListData);
 
     fetch("/api/webapi/GetUserInfo")
@@ -2474,3 +2480,5 @@ socket.on("data-server-k3", async function (msg) {
 
   // $("#popup_modal").css("display", "block");
 });
+
+
