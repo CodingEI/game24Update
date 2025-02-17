@@ -19,6 +19,12 @@ var audio2 = new Audio("/audio/di2.317de251.mp3");
 
 var clicked = false;
 
+var activeTab = "total";
+function handleTabClick(tabName) {
+  activeTab = tabName;
+ 
+}
+
 function openAudio() {
   audio1.muted = true;
   audio1.play();
@@ -431,7 +437,7 @@ function showGameHistoryData(list_orders, type = "total") {
       // const totalSum = totalString.reduce(
       //   (prev, total) => parseInt(prev) + parseInt(total),
       // );
-      const sum = result_show_dice.split('').reduce((acc, digit) => acc + Number(digit), 0);
+      const sum = result_show_dice?.split('').reduce((acc, digit) => acc + Number(digit), 0);
 
 
       let typeSpecificHTML = "";
@@ -891,6 +897,8 @@ function showMyBetsData(list_orders) {
   $(containerId).html(html);
 }
 
+
+
 function initGameLogics({
   GAME_TYPE_ID,
   GAME_NAME,
@@ -937,13 +945,8 @@ function initGameLogics({
     }
   };
 
-  let activeTab = "total";
-  function handleTabClick(tabName) {
-    activeTab = tabName;
-   
-  }
+ 
 
-  console.log("activeTab", activeTab)
 
   $("#total_bet_tab_btn").off("click.total_bet_tab_btn");
   $("#total_bet_tab_btn").on("click.total_bet_tab_btn", function (e) {
@@ -2342,14 +2345,14 @@ function handleMyEmerdList() {
   });
 }
 let GAME_TYPE = getGameType();
-activeTab="total"
+
 
 var pageno = 0;
 var limit = 10;
 var page = 1;
 socket.on("data-server-k3", async function (msg) {
 
-  console.log("activeTab", activeTab)
+  console.log("activeTab...................", activeTab)
 
   try {
     GAME_TYPE_ID = getGameType();
@@ -2454,8 +2457,8 @@ socket.on("data-server-k3", async function (msg) {
       type: TAB_SECTION_MAP.MY_BETS,
     });
 
-    showGameHistoryData(gameListData);
-    showTrendData(gameListData, "total");
+    showGameHistoryData(gameListData, activeTab);
+    showTrendData(gameListData, activeTab);
     showMyBetsData(betListData);
 
     fetch("/api/webapi/GetUserInfo")

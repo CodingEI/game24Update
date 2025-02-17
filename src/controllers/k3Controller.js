@@ -1604,7 +1604,7 @@ async function plusMoney(game) {
           }
           if (check1) {
             let total = orders.money / (arr1.length + bala) / orders.amount;
-            nhan_duoc += total * 207.36 - orders.fee;
+            nhan_duoc += total * 2 - orders.fee;
           }
         }
       }
@@ -1617,7 +1617,7 @@ async function plusMoney(game) {
         }
         let total = orders.money / (1 + bala) / orders.amount;
         console.log("total", total)
-        nhan_duoc += (total * 34.56 - orders.fee) * 2;
+        nhan_duoc += (total * 2 - orders.fee) * 2;
       }
 
       nhan_duoc = orders.money * 2;
