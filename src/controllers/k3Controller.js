@@ -1059,27 +1059,26 @@ async function funHandingThreeSame(game, join_bet, game_type) {
  */
 function generateCombinations(game_type) {
   const numbers = [1, 2, 3, 4, 5, 6];
-  if('first' === game_type){
-  // Function to generate all combinations of three numbers from 1 to 
-  const combinations = [];
-  for (let i = 0; i < numbers.length; i++) {
-    for (let j = i + 1; j < numbers.length; j++) {
-      for (let k = j + 1; k < numbers.length; k++) {
-        combinations.push(`${numbers[i]},${numbers[j]},${numbers[k]}@y@`);
+  let combinations = [];
+  if (game_type === 'first') {
+    // Generate all possible 3-digit combinations using numbers 1-6
+    for (let i = 0; i < numbers.length; i++) {
+      for (let j = 0; j < numbers.length; j++) {
+        for (let k = 0; k < numbers.length; k++) {
+          combinations.push(`${numbers[i]},${numbers[j]},${numbers[k]}@y@`);
+        }
+      }
+    }
+  } else if (game_type === 'third') {
+    console.log("cal.......................");
+    // Generate all possible 2-digit combinations using numbers 1-6
+    for (let i = 0; i < numbers.length; i++) { 
+      for (let j = 0; j < numbers.length; j++) {
+        combinations.push(`@y@${numbers[i]},${numbers[j]}`);
       }
     }
   }
   return combinations;
-  }else if('third' === game_type){ // if the game type is third
-    console.log("cal.......................")
-    const combinations = [];
-    for (let i = 0; i < numbers.length; i++) { 
-      for (let j = i + 1; j < numbers.length; j++) {
-        combinations.push(`@y@${numbers[i]},${numbers[j]}`);
-      }
-    }
-    return combinations;  // retun the combination with 2 numbers 
-  }
 }
 
 
@@ -1094,6 +1093,8 @@ async function funHandingDifferent(game, join_bet, game_type) {
   if ('first' === game_type) {
       // Generate all combinations
       const allCombinations = generateCombinations(game_type);
+      console.log("allCombinations...........allCombinations3333333",allCombinations)
+      console.log("allCombinations...........allCombinations333333333",allCombinations.length)
       if (allCombinations.length === 0) return; // No combinations, exit early
       // Prepare SQL placeholders
       const placeholders = allCombinations.map(() => '?').join(',');
@@ -1280,6 +1281,9 @@ async function funHandingDifferent(game, join_bet, game_type) {
   else if('third' === game_type){
       // Generate all combinations
       const allCombinations = generateCombinations(game_type);
+      console.log("allCombinations...........allCombinations4444444444",allCombinations)
+      console.log("allCombinations...........allCombinations4444444444",allCombinations.length)
+
       if (allCombinations.length === 0) return; // No combinations, exit early
       // Prepare SQL placeholders
       const placeholders = allCombinations.map(() => '?').join(',');
@@ -1296,11 +1300,14 @@ async function funHandingDifferent(game, join_bet, game_type) {
       const [different_number_bet] = await connection.execute(query, params);
       // Convert result into { 'bet_value': amount }
       const finalBetObject = calculateBetTotals(different_number_bet);
+      console.log("finalBetObject----444444-------", finalBetObject)
       // Check if all keys exist using every()
       const missingKeys = allCombinations.filter(key => !Object.hasOwn(finalBetObject, key));
+      console.log("missingKeys----444444-------", missingKeys)
+
       let updatedResult = k3Info.result;
       if (missingKeys.length > 0) {
-
+        console.log("calll...........1111111111111")
         const win = missingKeys[Math.floor(Math.random() * missingKeys.length)];
         const winNumber = win.replace(/[^0-9]/g, '');
 
@@ -1327,6 +1334,8 @@ async function funHandingDifferent(game, join_bet, game_type) {
         return; // Exit only after all updates are completed
     }else{
         // Find the key with the lowest amount
+        console.log("calll...........22222222222222")
+
         let minKey = null;
         let minValue = Infinity;
         for (const key of allCombinations) {
@@ -1506,7 +1515,7 @@ async function plusMoney(game) {
       await connection.execute(sql, [nhan_duoc, phone]);
     }
     nhan_duoc = 0;
-    if (orders.typeGame == "two-same") {
+    if (orders.typeGame == "two-same") { // done
       let kq = result.split("");
       let kq1 = kq[0] + kq[1];
       let kq2 = kq[1] + kq[2];
@@ -1611,7 +1620,7 @@ async function plusMoney(game) {
         nhan_duoc += (total * 34.56 - orders.fee) * 2;
       }
 
-      nhan_duoc = (Number(orders.money ?? 0) * Number(orders.amount ?? 0) * 2) - Number(orders.fee ?? 0)
+      nhan_duoc = orders.money * 2;
       await connection.execute(
         "UPDATE `result_k3` SET `get` = ?, `status` = ? WHERE `id` = ? ",
         [nhan_duoc , 1, id],
