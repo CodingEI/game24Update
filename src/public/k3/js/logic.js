@@ -494,9 +494,9 @@ function showGameHistoryData(list_orders, type = "total") {
             ${typeSpecificHTML}
             <div data-v-4e09079f="" class="van-col van-col--6">
                 <div data-v-4e09079f="" class="GameRecord__C-body-premium">
-                    <div data-v-4e09079f="" class="n${result_show_dice[0]}"></div>
-                    <div data-v-4e09079f="" class="n${result_show_dice[1]}"></div>
-                    <div data-v-4e09079f="" class="n${result_show_dice[2]}"></div>
+                    <div data-v-4e09079f="" class="n${result_show_dice?.[0]}"></div>
+                    <div data-v-4e09079f="" class="n${result_show_dice?.[1]}"></div>
+                    <div data-v-4e09079f="" class="n${result_show_dice?.[2]}"></div>
                 </div>
             </div>
           </div>
