@@ -168,207 +168,199 @@ const validateBet = async (join, list_join, x, money, game) => {
   return true;
 };
 
-// const betK3 = async (req, res) => {
-//   console.log("cal....",req.body)
-//   try {
-//     let { listJoin, game, gameJoin, xvalue, money } = req.body;
-//     let auth = req.cookies.auth;
+const betK3ForOther = async (req, res) => {
+  console.log("cal....",req.body)
+  try {
+    let { listJoin, game, gameJoin, xvalue, money } = req.body;
+    let auth = req.cookies.auth;
    
 
-//     // let validate = await validateBet(join, list_join, x, money, game);
+    // let validate = await validateBet(join, list_join, x, money, game);
 
-//     // if (!validate) {
-//     //     return res.status(200).json({
-//     //         message: 'Đặt cược không hợp lệ',
-//     //         status: false
-//     //     });
-//     // }
+    // if (!validate) {
+    //     return res.status(200).json({
+    //         message: 'Đặt cược không hợp lệ',
+    //         status: false
+    //     });
+    // }
 
-//     const [k3Now] = await connection.query(
-//       `SELECT period FROM k3 WHERE status = 0 AND game = ${game} ORDER BY id DESC LIMIT 1 `,
-//     );
+    const [k3Now] = await connection.query(
+      `SELECT period FROM k3 WHERE status = 0 AND game = ${game} ORDER BY id DESC LIMIT 1 `,
+    );
   
-//     const [user] = await connection.query(
-//       "SELECT `phone`, `code`, `invite`, `level`, `money` FROM users WHERE token = ? AND veri = 1  LIMIT 1 ",
-//       [auth],
-//     );
-//     console.log("cal  2222...........", k3Now, user)
-//     if (k3Now.length < 1 || user.length < 1) {
-//       return res.status(200).json({
-//         message: "Error!",
-//         status: false,
-//       });
-//     }
+    const [user] = await connection.query(
+      "SELECT `phone`, `code`, `invite`, `level`, `money` FROM users WHERE token = ? AND veri = 1  LIMIT 1 ",
+      [auth],
+    );
+    console.log("cal  2222...........", k3Now, user)
+    if (k3Now.length < 1 || user.length < 1) {
+      return res.status(200).json({
+        message: "Error!",
+        status: false,
+      });
+    }
 
-//     console.log("cal  1...........")
-//     let userInfo = user[0];
-//     let period = k3Now[0];
+    console.log("cal  1...........")
+    let userInfo = user[0];
+    let period = k3Now[0];
 
-//     let date = new Date();
-//     let years = formateT(date.getFullYear());
-//     let months = formateT(date.getMonth() + 1);
-//     let days = formateT(date.getDate());
-//     let id_product =
-//       years + months + days + Math.floor(Math.random() * 1000000000000000);
+    let date = new Date();
+    let years = formateT(date.getFullYear());
+    let months = formateT(date.getMonth() + 1);
+    let days = formateT(date.getDate());
+    let id_product =
+      years + months + days + Math.floor(Math.random() * 1000000000000000);
 
-//     let total = 0;
-//     if (gameJoin == 1) {
-//       total = money * xvalue * String(listJoin).split(",").length;
-//     } else if (gameJoin == 2) {
-//       let twoSame = listJoin.split("@")[0]; // Chọn 2 số phù hợp
-//       let motDuyNhat = listJoin.split("@")[1]; // Chọn một cặp số duy nhất
-//       if (twoSame.length > 0) {
-//         twoSame = twoSame.split(",").length;
-//       }
-//       let lengthArr = 0;
-//       let count = 0;
-//       if (motDuyNhat.length > 0) {
-//         let arr = motDuyNhat.split("&");
-//         for (let i = 0; i < arr.length; i++) {
-//           motDuyNhat = arr[i].split("|");
-//           count = motDuyNhat[1].split(",").length;
-//         }
-//         lengthArr = arr.length;
-//         count = count;
-//       }
-//       total = money * xvalue * (lengthArr * count) + twoSame * money * xvalue;
-//     } else if (gameJoin == 3) {
-//       let baDuyNhat = listJoin.split("@")[0]; // Chọn 3 số duy nhất
-//       let countBaDuyNhat = 0;
-//       if (baDuyNhat.length > 0) {
-//         countBaDuyNhat = baDuyNhat.split(",").length;
-//       }
-//       let threeSame = listJoin.split("@")[1].length; // Chọn 3 số giống nhau
-//       total = money * xvalue * countBaDuyNhat + threeSame * money * xvalue;
-//     } else if (gameJoin == 4) {
-//       let threeNumberUnlike = listJoin.split("@")[0]; // Chọn 3 số duy nhất
-//       let twoLienTiep = listJoin.split("@")[1]; // Chọn 3 số liên tiếp
-//       let twoNumberUnlike = listJoin.split("@")[2]; // Chọn 3 số duy nhất
+    let total = 0;
+    if (gameJoin == 1) {
+      total = money * xvalue * String(listJoin).split(",").length;
+    } else if (gameJoin == 2) {
+      let twoSame = listJoin.split("@")[0]; // Chọn 2 số phù hợp
+      let motDuyNhat = listJoin.split("@")[1]; // Chọn một cặp số duy nhất
+      if (twoSame.length > 0) {
+        twoSame = twoSame.split(",").length;
+      }
+      let lengthArr = 0;
+      let count = 0;
+      if (motDuyNhat.length > 0) {
+        let arr = motDuyNhat.split("&");
+        for (let i = 0; i < arr.length; i++) {
+          motDuyNhat = arr[i].split("|");
+          count = motDuyNhat[1].split(",").length;
+        }
+        lengthArr = arr.length;
+        count = count;
+      }
+      total = money * xvalue * (lengthArr * count) + twoSame * money * xvalue;
+    } else if (gameJoin == 3) {
+      let baDuyNhat = listJoin.split("@")[0]; // Chọn 3 số duy nhất
+      let countBaDuyNhat = 0;
+      if (baDuyNhat.length > 0) {
+        countBaDuyNhat = baDuyNhat.split(",").length;
+      }
+      let threeSame = listJoin.split("@")[1].length; // Chọn 3 số giống nhau
+      total = money * xvalue * countBaDuyNhat + threeSame * money * xvalue;
+    } else if (gameJoin == 4) {
+      let threeNumberUnlike = listJoin.split("@")[0]; // Chọn 3 số duy nhất
+      let twoLienTiep = listJoin.split("@")[1]; // Chọn 3 số liên tiếp
+      let twoNumberUnlike = listJoin.split("@")[2]; // Chọn 3 số duy nhất
 
-//       let threeUn = 0;
-//       if (threeNumberUnlike.length > 0) {
-//         let arr = threeNumberUnlike.split(",").length;
-//         if (arr <= 4) {
-//           threeUn += xvalue * (money * arr);
-//         }
-//         if (arr == 5) {
-//           threeUn += xvalue * (money * arr) * 2;
-//         }
-//         if (arr == 6) {
-//           threeUn += xvalue * (money * 5) * 4;
-//         }
-//       }
-//       let twoUn = 0;
-//       if (twoNumberUnlike.length > 0) {
-//         let arr = twoNumberUnlike.split(",").length;
-//         if (arr <= 3) {
-//           twoUn += xvalue * (money * arr);
-//         }
-//         if (arr == 4) {
-//           twoUn += xvalue * (money * arr) * 1.5;
-//         }
-//         if (arr == 5) {
-//           twoUn += xvalue * (money * arr) * 2;
-//         }
-//         if (arr == 6) {
-//           twoUn += xvalue * (money * arr * 2.5);
-//         }
-//       }
-//       let UnlienTiep = 0;
-//       if (twoLienTiep == "u") {
-//         UnlienTiep += xvalue * money;
-//       }
-//       total = threeUn + twoUn + UnlienTiep;
-//     }
-//     let fee = total * 0.02;
-//     let price = total - fee;
+      let threeUn = 0;
+      if (threeNumberUnlike.length > 0) {
+        let arr = threeNumberUnlike.split(",").length;
+        if (arr <= 4) {
+          threeUn += xvalue * (money * arr);
+        }
+        if (arr == 5) {
+          threeUn += xvalue * (money * arr) * 2;
+        }
+        if (arr == 6) {
+          threeUn += xvalue * (money * 5) * 4;
+        }
+      }
+      let twoUn = 0;
+      if (twoNumberUnlike.length > 0) {
+        let arr = twoNumberUnlike.split(",").length;
+        if (arr <= 3) {
+          twoUn += xvalue * (money * arr);
+        }
+        if (arr == 4) {
+          twoUn += xvalue * (money * arr) * 1.5;
+        }
+        if (arr == 5) {
+          twoUn += xvalue * (money * arr) * 2;
+        }
+        if (arr == 6) {
+          twoUn += xvalue * (money * arr * 2.5);
+        }
+      }
+      let UnlienTiep = 0;
+      if (twoLienTiep == "u") {
+        UnlienTiep += xvalue * money;
+      }
+      total = threeUn + twoUn + UnlienTiep;
+    }
+    let fee = total * 0.02;
+    let price = total - fee;
 
-//     let typeGame = "";
-//     if (gameJoin == 1) typeGame = "total";
-//     if (gameJoin == 2) typeGame = "two-same";
-//     if (gameJoin == 3) typeGame = "three-same";
-//     if (gameJoin == 4) typeGame = "unlike";
-//     console.log("cal  2...........")
-//     let check = userInfo.money - total;
-//     if (check >= 0) {
-//       let timeNow = Date.now();
-//       const sql = `INSERT INTO result_k3 SET id_product = ?,phone = ?,code = ?,invite = ?,stage = ?,level = ?,money = ?,price = ?,amount = ?,fee = ?,game = ?,join_bet = ?, typeGame = ?,bet = ?,status = ?,time = ?`;
-//       await connection.execute(sql, [
-//         id_product,
-//         userInfo.phone,
-//         userInfo.code,
-//         userInfo.invite,
-//         period.period,
-//         userInfo.level,
-//         total,
-//         price,
-//         xvalue,
-//         fee,
-//         game,
-//         gameJoin,
-//         typeGame,
-//         listJoin,
-//         0,
-//         timeNow,
-//       ]);
+    let typeGame = "";
+    if (gameJoin == 1) typeGame = "total";
+    if (gameJoin == 2) typeGame = "two-same";
+    if (gameJoin == 3) typeGame = "three-same";
+    if (gameJoin == 4) typeGame = "unlike";
+    console.log("cal  2...........")
+    let check = userInfo.money - total;
+    if (check >= 0) {
+      let timeNow = Date.now();
+      const sql = `INSERT INTO result_k3 SET id_product = ?,phone = ?,code = ?,invite = ?,stage = ?,level = ?,money = ?,price = ?,amount = ?,fee = ?,game = ?,join_bet = ?, typeGame = ?,bet = ?,status = ?,time = ?`;
+      await connection.execute(sql, [
+        id_product,
+        userInfo.phone,
+        userInfo.code,
+        userInfo.invite,
+        period.period,
+        userInfo.level,
+        total,
+        price,
+        xvalue,
+        fee,
+        game,
+        gameJoin,
+        typeGame,
+        listJoin,
+        0,
+        timeNow,
+      ]);
 
-//       console.log("cal  last...........")
-//       await connection.execute(
-//         "UPDATE `users` SET `money` = `money` - ? WHERE `token` = ? ",
-//         [total, auth],
-//       );
-//       const [users] = await connection.query(
-//         "SELECT `money`, `level` FROM users WHERE token = ? AND veri = 1  LIMIT 1 ",
-//         [auth],
-//       );
-//       await rosesPlus(auth, total);
-//       const [level] = await connection.query("SELECT * FROM level ");
-//       let level0 = level[0];
-//       const sql2 = `INSERT INTO roses SET phone = ?,code = ?,invite = ?,f1 = ?,f2 = ?,f3 = ?,f4 = ?,time = ?`;
-//       let total_m = total;
-//       let f1 = (total_m / 100) * level0.f1;
-//       let f2 = (total_m / 100) * level0.f2;
-//       let f3 = (total_m / 100) * level0.f3;
-//       let f4 = (total_m / 100) * level0.f4;
-//       await connection.execute(sql2, [
-//         userInfo.phone,
-//         userInfo.code,
-//         userInfo.invite,
-//         f1,
-//         f2,
-//         f3,
-//         f4,
-//         timeNow,
-//       ]);
-//       return res.status(200).json({
-//         message: "Successful bet",
-//         status: true,
-//         // data: result,
-//         change: users[0].level,
-//         money: users[0].money,
-//       });
-//     } else {
-//       return res.status(200).json({
-//         message: "The amount is not enough",
-//         status: false,
-//       });
-//     }
-//   } catch (error) {
-//     console.log(error);
-//   }
-// };
+      console.log("cal  last...........")
+      await connection.execute(
+        "UPDATE `users` SET `money` = `money` - ? WHERE `token` = ? ",
+        [total, auth],
+      );
+      const [users] = await connection.query(
+        "SELECT `money`, `level` FROM users WHERE token = ? AND veri = 1  LIMIT 1 ",
+        [auth],
+      );
+      await rosesPlus(auth, total);
+      const [level] = await connection.query("SELECT * FROM level ");
+      let level0 = level[0];
+      const sql2 = `INSERT INTO roses SET phone = ?,code = ?,invite = ?,f1 = ?,f2 = ?,f3 = ?,f4 = ?,time = ?`;
+      let total_m = total;
+      let f1 = (total_m / 100) * level0.f1;
+      let f2 = (total_m / 100) * level0.f2;
+      let f3 = (total_m / 100) * level0.f3;
+      let f4 = (total_m / 100) * level0.f4;
+      await connection.execute(sql2, [
+        userInfo.phone,
+        userInfo.code,
+        userInfo.invite,
+        f1,
+        f2,
+        f3,
+        f4,
+        timeNow,
+      ]);
+      return res.status(200).json({
+        message: "Successful bet",
+        status: true,
+        // data: result,
+        change: users[0].level,
+        money: users[0].money,
+      });
+    } else {
+      return res.status(200).json({
+        message: "The amount is not enough",
+        status: false,
+      });
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
 
-// function makeGameResult(length) {
-//   var result = "";
-//   var characters = "123456";
-//   var charactersLength = characters.length;
-//   for (var i = 0; i < length; i++) {
-//     result += characters.charAt(Math.floor(Math.random() * charactersLength));
-//   }
-//   return result;
-// }
 
-const betK3 = async (req, res) => {
+
+const  betK3ForTwoSome= async (req, res) => {
   console.log("cal....", req.body);
   try {
     let { listJoin, game, gameJoin, xvalue, money } = req.body;
@@ -487,6 +479,19 @@ const betK3 = async (req, res) => {
 };
 
 
+const betK3 = async (req, res)=>{
+
+  const {gameJoin} = req.body;
+
+  console.log("gameJoin............", gameJoin)
+
+  if(gameJoin === 1){
+    betK3ForTwoSome(req, res)
+  }else{
+    betK3ForOther(req, res)
+  }
+  
+}
 const addK3 = async (game) => {
   try {
     let join = "";
@@ -1485,8 +1490,10 @@ async function plusMoney(game) {
   );
 
 
+  console.log("orders,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,", order);
   for (let i = 0; i < order.length; i++) {
     let orders = order[i];
+    
     
 
     let phone = orders.phone;
@@ -1738,18 +1745,19 @@ async function plusMoney(game) {
 
     nhan_duoc = 0;
     if (orders.typeGame == "unlike") {
+      console.log("result", result)
       let kq = result.split("");
       let array = orders.bet.split("@");
-      let arr1 = array[0].split(",");
+      let arr1 = array[0]?.split(",");
       let arr2 = array[1];
-      let arr3 = array[2].split(",");
+      let arr3 = array[2]?.split(",");
 
-      for (let i = 0; i < arr1.length; i++) {
+      for (let i = 0; i < arr1?.length; i++) {
         if (arr1[i] != "") {
           let check1 = kq.includes(arr1[i]);
           let bala = 0;
           let bala2 = 0;
-          for (let i = 0; i < arr3.length; i++) {
+          for (let i = 0; i < arr3?.length; i++) {
             if (arr3[i].length != "") {
               bala = arr3.length;
             }
@@ -1814,7 +1822,7 @@ async function plusMoney(game) {
 const handlingK3 = async (typeid) => {
   try {
     let game = Number(typeid);
-
+    console.log("game11111111111111", game)
 
 
     await funHanding(game);
@@ -1826,6 +1834,8 @@ const handlingK3 = async (typeid) => {
     await funHandingDifferent(game, 4, "first")
     await funHandingDifferent(game, 4, "second")
     await funHandingDifferent(game, 4, "third")
+
+    console.log("game222222222222222", game)
 
     await plusMoney(game);
   } catch (err) {
