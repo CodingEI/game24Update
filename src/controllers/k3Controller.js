@@ -520,6 +520,326 @@ const  betK3ForOther= async (req, res) => {
   }
 };
 
+// const betK3ForDifferent = async (req, res) => {
+//   console.log("cal....",req.body)
+//   try {
+//     let { listJoin, game, gameJoin, xvalue, money } = req.body;
+//     let auth = req.cookies.auth;
+
+
+//     const [k3Now] = await connection.query(
+//       `SELECT period FROM k3 WHERE status = 0 AND game = ${game} ORDER BY id DESC LIMIT 1 `,
+//     );
+  
+//     const [user] = await connection.query(
+//       "SELECT `phone`, `code`, `invite`, `level`, `money` FROM users WHERE token = ? AND veri = 1  LIMIT 1 ",
+//       [auth],
+//     );
+//     console.log("cal  2222...........", k3Now, user)
+//     if (k3Now.length < 1 || user.length < 1) {
+//       return res.status(200).json({
+//         message: "Error!",
+//         status: false,
+//       });
+//     }
+
+//     console.log("cal  1...........")
+//     let userInfo = user[0];
+//     let period = k3Now[0];
+
+//     let date = new Date();
+//     let years = formateT(date.getFullYear());
+//     let months = formateT(date.getMonth() + 1);
+//     let days = formateT(date.getDate());
+//     let id_product =
+//       years + months + days + Math.floor(Math.random() * 1000000000000000);
+
+//       console.log("gameJoin", gameJoin)
+
+//     let total = 0;
+//    if (gameJoin == 4) {
+//       let threeNumberUnlike = listJoin.split("@")[0]; // Chọn 3 số duy nhất
+//       let twoLienTiep = listJoin.split("@")[1]; // Chọn 3 số liên tiếp
+//       let twoNumberUnlike = listJoin.split("@")[2]; // Chọn 3 số duy nhất
+
+//       console.log("threeNumberUnlike", threeNumberUnlike, twoNumberUnlike)
+//       console.log("twoLienTiep", twoLienTiep)
+//       console.log("twoNumberUnlike", twoNumberUnlike)
+
+//       let threeUn = 0;
+//       if (threeNumberUnlike.length > 0) {
+//         let arr = threeNumberUnlike.split(",").length;
+//         if (arr <= 4) {
+//           threeUn += xvalue * (money * arr);
+//         }
+//         if (arr == 5) {
+//           threeUn += xvalue * (money * arr) * 2;
+//         }
+//         if (arr == 6) {
+//           threeUn += xvalue * (money * 5) * 4;
+//         }
+//       }
+//       let twoUn = 0;
+//       if (twoNumberUnlike.length > 0) {
+//         let arr = twoNumberUnlike.split(",").length;
+//         if (arr <= 3) {
+//           twoUn += xvalue * (money * arr);
+//         }
+//         if (arr == 4) {
+//           twoUn += xvalue * (money * arr) * 1.5;
+//         }
+//         if (arr == 5) {
+//           twoUn += xvalue * (money * arr) * 2;
+//         }
+//         if (arr == 6) {
+//           twoUn += xvalue * (money * arr * 2.5);
+//         }
+//       }
+//       let UnlienTiep = 0;
+//       if (twoLienTiep == "u") {
+//         UnlienTiep += xvalue * money;
+//       }
+//       total = threeUn + twoUn + UnlienTiep;
+//     }
+//     let fee = total * 0.02;
+//     let price = total - fee;
+
+//     let typeGame = "";
+
+//     if (gameJoin == 4) typeGame = "unlike";
+  
+//     let check = userInfo.money - total;
+//     if (check >= 0) {
+//       let timeNow = Date.now();
+//       const sql = `INSERT INTO result_k3 SET id_product = ?,phone = ?,code = ?,invite = ?,stage = ?,level = ?,money = ?,price = ?,amount = ?,fee = ?,game = ?,join_bet = ?, typeGame = ?,bet = ?,status = ?,time = ?`;
+//       await connection.execute(sql, [
+//         id_product,
+//         userInfo.phone,
+//         userInfo.code,
+//         userInfo.invite,
+//         period.period,
+//         userInfo.level,
+//         total,
+//         price,
+//         xvalue,
+//         fee,
+//         game,
+//         gameJoin,
+//         typeGame,
+//         listJoin,
+//         0,
+//         timeNow,
+//       ]);
+
+//       console.log("cal  last...........")
+//       await connection.execute(
+//         "UPDATE `users` SET `money` = `money` - ? WHERE `token` = ? ",
+//         [total, auth],
+//       );
+//       const [users] = await connection.query(
+//         "SELECT `money`, `level` FROM users WHERE token = ? AND veri = 1  LIMIT 1 ",
+//         [auth],
+//       );
+//       await rosesPlus(auth, total);
+//       const [level] = await connection.query("SELECT * FROM level ");
+//       let level0 = level[0];
+//       const sql2 = `INSERT INTO roses SET phone = ?,code = ?,invite = ?,f1 = ?,f2 = ?,f3 = ?,f4 = ?,time = ?`;
+//       let total_m = total;
+//       let f1 = (total_m / 100) * level0.f1;
+//       let f2 = (total_m / 100) * level0.f2;
+//       let f3 = (total_m / 100) * level0.f3;
+//       let f4 = (total_m / 100) * level0.f4;
+//       await connection.execute(sql2, [
+//         userInfo.phone,
+//         userInfo.code,
+//         userInfo.invite,
+//         f1,
+//         f2,
+//         f3,
+//         f4,
+//         timeNow,
+//       ]);
+//       return res.status(200).json({
+//         message: "Successful bet",
+//         status: true,
+//         // data: result,
+//         change: users[0].level,
+//         money: users[0].money,
+//       });
+//     } else {
+//       return res.status(200).json({
+//         message: "The amount is not enough",
+//         status: false,
+//       });
+//     }
+//   } catch (error) {
+//     console.log(error);
+//   }
+// };
+
+const betK3ForDifferent = async (req, res) => {
+  console.log("cal....", req.body);
+  try {
+    let { listJoin, game, gameJoin, xvalue, money } = req.body;
+    let auth = req.cookies.auth;
+
+    const [k3Now] = await connection.query(
+      `SELECT period FROM k3 WHERE status = 0 AND game = ${game} ORDER BY id DESC LIMIT 1`
+    );
+
+    const [user] = await connection.query(
+      "SELECT `phone`, `code`, `invite`, `level`, `money` FROM users WHERE token = ? AND veri = 1 LIMIT 1",
+      [auth]
+    );
+
+    if (k3Now.length < 1 || user.length < 1) {
+      return res.status(200).json({
+        message: "Error!",
+        status: false,
+      });
+    }
+
+    let userInfo = user[0];
+    let period = k3Now[0];
+
+    let date = new Date();
+    let years = formateT(date.getFullYear());
+    let months = formateT(date.getMonth() + 1);
+    let days = formateT(date.getDate());
+    let id_product =
+      years + months + days + Math.floor(Math.random() * 1000000000000000);
+
+    let bets = [];
+
+    // Handle @y@ cases
+    if (listJoin.endsWith("@y@")) {
+      let numbers = listJoin.replace("@y@", "").split(",");
+      for (let i = 0; i < numbers.length; i += 3) {
+        if (numbers[i + 2]) {
+          bets.push(numbers[i] + numbers[i + 1] + numbers[i + 2] + "@y@");
+        }
+      }
+    } else if (listJoin.startsWith("@y@")) {
+      let numbers = listJoin.replace("@y@", "").split(",");
+      for (let i = 0; i < numbers.length; i += 2) {
+        if (numbers[i + 1]) {
+          bets.push("@y@" + numbers[i] + numbers[i + 1]);
+        }
+      }
+    } else if (listJoin === "@u@") {
+      bets.push("@u@");
+    } else {
+      bets.push(listJoin);
+    }
+
+    let total = 0;
+    
+    // Process each bet separately
+    for (let bet of bets) {
+      let threeNumberUnlike = bet.split("@")[0];
+      let twoLienTiep = bet.split("@")[1];
+      let twoNumberUnlike = bet.split("@")[2];
+
+      let threeUn = 0;
+      if (threeNumberUnlike.length > 0) {
+        let arr = threeNumberUnlike.split(",").length;
+        if (arr <= 4) threeUn += xvalue * (money * arr);
+        if (arr == 5) threeUn += xvalue * (money * arr) * 2;
+        if (arr == 6) threeUn += xvalue * (money * 5) * 4;
+      }
+
+      let twoUn = 0;
+      if (twoNumberUnlike.length > 0) {
+        let arr = twoNumberUnlike.split(",").length;
+        if (arr <= 3) twoUn += xvalue * (money * arr);
+        if (arr == 4) twoUn += xvalue * (money * arr) * 1.5;
+        if (arr == 5) twoUn += xvalue * (money * arr) * 2;
+        if (arr == 6) twoUn += xvalue * (money * arr * 2.5);
+      }
+
+      let UnlienTiep = 0;
+      if (twoLienTiep == "u") {
+        UnlienTiep += xvalue * money;
+      }
+
+      total += threeUn + twoUn + UnlienTiep;
+
+      let fee = total * 0.02;
+      let price = total - fee;
+
+      let check = userInfo.money - total;
+      if (check >= 0) {
+        let timeNow = Date.now();
+        await connection.execute(
+          `INSERT INTO result_k3 SET id_product = ?, phone = ?, code = ?, invite = ?, stage = ?, level = ?, money = ?, price = ?, amount = ?, fee = ?, game = ?, join_bet = ?, typeGame = ?, bet = ?, status = ?, time = ?`,
+          [
+            id_product,
+            userInfo.phone,
+            userInfo.code,
+            userInfo.invite,
+            period.period,
+            userInfo.level,
+            total,
+            price,
+            xvalue,
+            fee,
+            game,
+            gameJoin,
+            "unlike",
+            bet,
+            0,
+            timeNow,
+          ]
+        );
+
+        await connection.execute(
+          "UPDATE `users` SET `money` = `money` - ? WHERE `token` = ?",
+          [total, auth]
+        );
+
+        const [users] = await connection.query(
+          "SELECT `money`, `level` FROM users WHERE token = ? AND veri = 1 LIMIT 1",
+          [auth]
+        );
+
+        await rosesPlus(auth, total);
+
+        const [level] = await connection.query("SELECT * FROM level ");
+        let level0 = level[0];
+
+        await connection.execute(
+          `INSERT INTO roses SET phone = ?, code = ?, invite = ?, f1 = ?, f2 = ?, f3 = ?, f4 = ?, time = ?`,
+          [
+            userInfo.phone,
+            userInfo.code,
+            userInfo.invite,
+            (total / 100) * level0.f1,
+            (total / 100) * level0.f2,
+            (total / 100) * level0.f3,
+            (total / 100) * level0.f4,
+            timeNow,
+          ]
+        );
+
+        return res.status(200).json({
+          message: "Successful bet",
+          status: true,
+          change: users[0].level,
+          money: users[0].money,
+        });
+      } else {
+        return res.status(200).json({
+          message: "The amount is not enough",
+          status: false,
+        });
+      }
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+
 
 const betK3 = async (req, res)=>{
 
@@ -530,7 +850,11 @@ const betK3 = async (req, res)=>{
   if(Number(gameJoin) === 1){
     console.log("cal.........................111111111111111")
     betK3ForTwoSome(req, res)
-  }else{
+  } else if(Number(gameJoin) === 4){
+    console.log("cal.......................333333333333333")
+    betK3ForDifferent(req, res)
+
+  }  else{
     console.log("cal.........................22222222222222")
     betK3ForOther(req, res)
   }
@@ -1788,76 +2112,76 @@ async function plusMoney(game) {
     }
 
     nhan_duoc = 0;
-    // if (orders.typeGame == "unlike") {
-    //   console.log("result", result)
-    //   let kq = result.split("");
-    //   let array = orders.bet.split("@");
-    //   let arr1 = array[0]?.split(",");
-    //   let arr2 = array[1];
-    //   let arr3 = array[2]?.split(",");
+    if (orders.typeGame == "unlike") {
+      console.log("result", result)
+      let kq = result.split("");
+      let array = orders.bet.split("@");
+      let arr1 = array[0]?.split(",");
+      let arr2 = array[1];
+      let arr3 = array[2]?.split(",");
 
-    //   for (let i = 0; i < arr1?.length; i++) {
-    //     if (arr1[i] != "") {
-    //       let check1 = kq.includes(arr1[i]);
-    //       let bala = 0;
-    //       let bala2 = 0;
-    //       for (let i = 0; i < arr3?.length; i++) {
-    //         if (arr3[i].length != "") {
-    //           bala = arr3.length;
-    //         }
-    //       }
-    //       if (arr2 == "u") {
-    //         bala2 = 1;
-    //       }
-    //       if (!check1) {
-    //         let total =
-    //           orders.money / (arr1.length + bala + bala2) / orders.amount;
-    //         nhan_duoc += total * 34.56 - orders.fee;
-    //         if (arr2 == "u") {
-    //           let total = orders.money / (1 + bala + bala2) / orders.amount;
-    //           nhan_duoc += (total - orders.fee) * 8.64;
-    //         }
-    //       }
-    //     }
-    //   }
-    //   if (arr2 == "u") {
-    //     let bala = 0;
-    //     let bala2 = 0;
-    //     for (let i = 0; i < arr1.length; i++) {
-    //       if (arr1[i] != "") {
-    //         bala = arr1.length;
-    //       }
-    //     }
-    //     for (let i = 0; i < arr3.length; i++) {
-    //       if (arr3[i].length != "") {
-    //         bala2 = arr3.length;
-    //       }
-    //     }
-    //     let total = orders.money / (1 + bala + bala2) / orders.amount;
-    //     nhan_duoc += (total - orders.fee) * 8.64;
-    //   }
-    //   for (let i = 0; i < arr3.length; i++) {
-    //     if (arr1[i] != "") {
-    //       let check1 = kq.includes(arr3[i]);
-    //       let bala = 0;
-    //       for (let i = 0; i < arr1.length; i++) {
-    //         if (arr1[i].length != "") {
-    //           bala = arr1.length;
-    //         }
-    //       }
-    //       if (!check1) {
-    //         let total = orders.money / (arr3.length + bala) / orders.amount;
-    //         nhan_duoc += total * 6.91 - orders.fee;
-    //       }
-    //     }
-    //   }
-    //   await connection.execute(
-    //     "UPDATE `result_k3` SET `get` = ?, `status` = 1 WHERE `id` = ? ",
-    //     [nhan_duoc, id],
-    //   );
-    //   const sql = "UPDATE `users` SET `money` = `money` + ? WHERE `phone` = ? ";
-    //   await connection.execute(sql, [nhan_duoc, phone]);
-    // }
+      for (let i = 0; i < arr1?.length; i++) {
+        if (arr1[i] != "") {
+          let check1 = kq.includes(arr1[i]);
+          let bala = 0;
+          let bala2 = 0;
+          for (let i = 0; i < arr3?.length; i++) {
+            if (arr3[i].length != "") {
+              bala = arr3.length;
+            }
+          }
+          if (arr2 == "u") {
+            bala2 = 1;
+          }
+          if (!check1) {
+            let total =
+              orders.money / (arr1.length + bala + bala2) / orders.amount;
+            nhan_duoc += total * 34.56 - orders.fee;
+            if (arr2 == "u") {
+              let total = orders.money / (1 + bala + bala2) / orders.amount;
+              nhan_duoc += (total - orders.fee) * 8.64;
+            }
+          }
+        }
+      }
+      if (arr2 == "u") {
+        let bala = 0;
+        let bala2 = 0;
+        for (let i = 0; i < arr1.length; i++) {
+          if (arr1[i] != "") {
+            bala = arr1.length;
+          }
+        }
+        for (let i = 0; i < arr3.length; i++) {
+          if (arr3[i].length != "") {
+            bala2 = arr3.length;
+          }
+        }
+        let total = orders.money / (1 + bala + bala2) / orders.amount;
+        nhan_duoc += (total - orders.fee) * 8.64;
+      }
+      for (let i = 0; i < arr3.length; i++) {
+        if (arr1[i] != "") {
+          let check1 = kq.includes(arr3[i]);
+          let bala = 0;
+          for (let i = 0; i < arr1.length; i++) {
+            if (arr1[i].length != "") {
+              bala = arr1.length;
+            }
+          }
+          if (!check1) {
+            let total = orders.money / (arr3.length + bala) / orders.amount;
+            nhan_duoc += total * 6.91 - orders.fee;
+          }
+        }
+      }
+      await connection.execute(
+        "UPDATE `result_k3` SET `get` = ?, `status` = 1 WHERE `id` = ? ",
+        [nhan_duoc, id],
+      );
+      const sql = "UPDATE `users` SET `money` = `money` + ? WHERE `phone` = ? ";
+      await connection.execute(sql, [nhan_duoc, phone]);
+    }
   }
 }
 
