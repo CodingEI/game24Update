@@ -716,14 +716,14 @@ const betK3ForDifferent = async (req, res) => {
       let numbers = listJoin.replace("@y@", "").split(",");
       for (let i = 0; i < numbers.length; i += 3) {
         if (numbers[i + 2]) {
-          bets.push(numbers[i] + numbers[i + 1] + numbers[i + 2] + "@y@");
+          bets.push(`${numbers[i]},${numbers[i + 1]},${numbers[i + 2]}@y@`);
         }
       }
     } else if (listJoin.startsWith("@y@")) {
       let numbers = listJoin.replace("@y@", "").split(",");
       for (let i = 0; i < numbers.length; i += 2) {
         if (numbers[i + 1]) {
-          bets.push("@y@" + numbers[i] + numbers[i + 1]);
+          bets.push(`@y@${numbers[i]},${numbers[i + 1]}`);
         }
       }
     } else if (listJoin === "@u@") {
@@ -731,7 +731,6 @@ const betK3ForDifferent = async (req, res) => {
     } else {
       bets.push(listJoin);
     }
-
     let total = 0;
     
     // Process each bet separately
@@ -1577,9 +1576,10 @@ async function funHandingDifferent(game, join_bet, game_type) {
       console.log("allCombinations...........allCombinations333333333",allCombinations.length)
       if (allCombinations.length === 0) return; // No combinations, exit early
       // Prepare SQL placeholders
-      const placeholders = allCombinations.map(() => '?').join(',');
-      const params = [0, game, join_bet, 'unlike', ...allCombinations];
-      // Fetch relevant bets
+      // Generate placeholders dynamically to match the exact number of elements in allCombinations
+      const placeholders = new Array(allCombinations.length).fill('?').join(',');
+      const params = [Number(0), game, join_bet, 'unlike', ...allCombinations]; // Flatten the array just in case
+      // Fetch relevant bets with a properly formatted query
       const query = `
         SELECT * FROM result_k3 
         WHERE status = ? 
@@ -1588,14 +1588,18 @@ async function funHandingDifferent(game, join_bet, game_type) {
         AND typeGame = ? 
         AND bet IN (${placeholders})
       `;
+      // Execute query with the prepared statement
       const [different_number_bet] = await connection.execute(query, params);
+      console.log("Fetched bets:", different_number_bet);
       // Convert result into { 'bet_value': amount }
       const finalBetObject = calculateBetTotals(different_number_bet);
+      console.log("finalBetObject---",finalBetObject)
       // Check if all keys exist using filter()
       const missingKeys = allCombinations.filter(key => !Object.hasOwn(finalBetObject, key));
       console.log("missingKeys444444444-", missingKeys)
       let updatedResult = k3Info.result;
       if (missingKeys.length > 0) {  
+        console.log("missing keyyyyyyyys block")
         const win = missingKeys[Math.floor(Math.random() * missingKeys.length)];
         const winNumber = win.replace(/[^0-9]/g, ''); // Remove everything except digits
     
@@ -1621,6 +1625,7 @@ async function funHandingDifferent(game, join_bet, game_type) {
         );
         return; // Exit only after all updates are completed
     }else{
+      console.log("least bet numberrr blockkkkkkkkkkkk")
         // Find the key with the lowest amount
       let minKey = null;
       let minValue = Infinity;
@@ -1805,11 +1810,17 @@ async function funHandingDifferent(game, join_bet, game_type) {
                 );
             }
         }
-        console.log("3same third game ----", updatedResult)
+        // Function to generate a random 3-digit number (each digit between 1-6)
+        const getRandomThreeDigitNumber = () => {
+          return `${Math.floor(Math.random() * 6) + 1}${Math.floor(Math.random() * 6) + 1}${Math.floor(Math.random() * 6) + 1}`;
+        };
+        // Append the random 3-digit number at the end of the string
+        const finalResult = updatedResult + ',' + getRandomThreeDigitNumber();
+        console.log("finalResult---",finalResult);
         // **UPDATE DATABASE**
         await connection.execute(
           `UPDATE k3 SET result = ? WHERE period = ? AND game = ?`,
-          [updatedResult, k3Info.period, game]
+          [finalResult, k3Info.period, game]
         );
         return; // Exit only after all updates are completed
     }else{
@@ -1840,14 +1851,19 @@ async function funHandingDifferent(game, join_bet, game_type) {
                 [key === minKey ? 0 : 2, 0, game, join_bet, 'unlike', key]
             );
         }
+        const getRandomThreeDigitNumber = () => {
+          return `${Math.floor(Math.random() * 6) + 1}${Math.floor(Math.random() * 6) + 1}${Math.floor(Math.random() * 6) + 1}`;
+        };
+        // Append the random 3-digit number at the end of the string
+        const finalResult = updatedResult + ',' + getRandomThreeDigitNumber();
+        console.log("finalResult===", finalResult);
         // **UPDATE DATABASE**
         await connection.execute(
           `UPDATE k3 SET result = ? WHERE period = ? AND game = ?`,
-          [updatedResult, k3Info.period, game]
+          [finalResult, k3Info.period, game]
         );
     }
     }
-      
 }
 
 
