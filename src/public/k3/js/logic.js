@@ -472,13 +472,13 @@ function showGameHistoryData(list_orders, type = "total") {
       } else if (type === "different") {
         typeSpecificHTML = `
           <div data-v-4e09079f="" class="van-col van-col--2">
-            <span data-v-4e09079f="">${result_show_one}</span>
+            <span data-v-4e09079f="">${result_show_one ?? 0}</span>
           </div>
           <div data-v-4e09079f="" class="van-col van-col--3">
-            <span data-v-4e09079f="">${result_show_two}</span>
+            <span data-v-4e09079f="">${result_show_two ?? 0}</span>
           </div>
           <div data-v-4e09079f="" class="van-col van-col--3">
-            <span data-v-4e09079f="">${result_show_three}</span>
+            <span data-v-4e09079f="">${result_show_three ?? 0}</span>
           </div>
         `;
       }
@@ -1004,6 +1004,7 @@ function initGameLogics({
   // --------------------- k3 game logic ---------------------
 
   function displayBetTotalMoney() {
+    console.log("cal1111111111111111111111111111111111")
     let value = parseInt($("#van-field-1-input").val().trim());
     let money = parseInt(
       $(".Betting__Popup-body-line-item.money.bgcolor")
@@ -1016,9 +1017,11 @@ function initGameLogics({
     } else {
       $(".Betting__Popup-foot-s").text(`Total amount`);
     }
+    $(".van-overlay").show();
+    // $(".van-overlay").css("display", "block");
   }
 
-  $(".van-overlay").fadeOut();
+  // $(".van-overlay").fadeOut();
   $(".popup-join").fadeOut();
 
   const setBetQuantity = (value) => {
