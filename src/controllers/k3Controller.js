@@ -2128,76 +2128,76 @@ async function plusMoney(game) {
     }
 
     nhan_duoc = 0;
-    if (orders.typeGame == "unlike") {
-      console.log("result", result)
-      let kq = result.split("");
-      let array = orders.bet.split("@");
-      let arr1 = array[0]?.split(",");
-      let arr2 = array[1];
-      let arr3 = array[2]?.split(",");
+    // if (orders.typeGame == "unlike") {
+    //   console.log("result", result)
+    //   let kq = result.split("");
+    //   let array = orders.bet.split("@");
+    //   let arr1 = array[0]?.split(",");
+    //   let arr2 = array[1];
+    //   let arr3 = array[2]?.split(",");
 
-      for (let i = 0; i < arr1?.length; i++) {
-        if (arr1[i] != "") {
-          let check1 = kq.includes(arr1[i]);
-          let bala = 0;
-          let bala2 = 0;
-          for (let i = 0; i < arr3?.length; i++) {
-            if (arr3[i].length != "") {
-              bala = arr3.length;
-            }
-          }
-          if (arr2 == "u") {
-            bala2 = 1;
-          }
-          if (!check1) {
-            let total =
-              orders.money / (arr1.length + bala + bala2) / orders.amount;
-            nhan_duoc += total * 34.56 - orders.fee;
-            if (arr2 == "u") {
-              let total = orders.money / (1 + bala + bala2) / orders.amount;
-              nhan_duoc += (total - orders.fee) * 8.64;
-            }
-          }
-        }
-      }
-      if (arr2 == "u") {
-        let bala = 0;
-        let bala2 = 0;
-        for (let i = 0; i < arr1.length; i++) {
-          if (arr1[i] != "") {
-            bala = arr1.length;
-          }
-        }
-        for (let i = 0; i < arr3.length; i++) {
-          if (arr3[i].length != "") {
-            bala2 = arr3.length;
-          }
-        }
-        let total = orders.money / (1 + bala + bala2) / orders.amount;
-        nhan_duoc += (total - orders.fee) * 8.64;
-      }
-      for (let i = 0; i < arr3.length; i++) {
-        if (arr1[i] != "") {
-          let check1 = kq.includes(arr3[i]);
-          let bala = 0;
-          for (let i = 0; i < arr1.length; i++) {
-            if (arr1[i].length != "") {
-              bala = arr1.length;
-            }
-          }
-          if (!check1) {
-            let total = orders.money / (arr3.length + bala) / orders.amount;
-            nhan_duoc += total * 6.91 - orders.fee;
-          }
-        }
-      }
-      await connection.execute(
-        "UPDATE `result_k3` SET `get` = ?, `status` = 1 WHERE `id` = ? ",
-        [nhan_duoc, id],
-      );
-      const sql = "UPDATE `users` SET `money` = `money` + ? WHERE `phone` = ? ";
-      await connection.execute(sql, [nhan_duoc, phone]);
-    }
+    //   for (let i = 0; i < arr1?.length; i++) {
+    //     if (arr1[i] != "") {
+    //       let check1 = kq.includes(arr1[i]);
+    //       let bala = 0;
+    //       let bala2 = 0;
+    //       for (let i = 0; i < arr3?.length; i++) {
+    //         if (arr3[i].length != "") {
+    //           bala = arr3.length;
+    //         }
+    //       }
+    //       if (arr2 == "u") {
+    //         bala2 = 1;
+    //       }
+    //       if (!check1) {
+    //         let total =
+    //           orders.money / (arr1.length + bala + bala2) / orders.amount;
+    //         nhan_duoc += total * 34.56 - orders.fee;
+    //         if (arr2 == "u") {
+    //           let total = orders.money / (1 + bala + bala2) / orders.amount;
+    //           nhan_duoc += (total - orders.fee) * 8.64;
+    //         }
+    //       }
+    //     }
+    //   }
+    //   if (arr2 == "u") {
+    //     let bala = 0;
+    //     let bala2 = 0;
+    //     for (let i = 0; i < arr1.length; i++) {
+    //       if (arr1[i] != "") {
+    //         bala = arr1.length;
+    //       }
+    //     }
+    //     for (let i = 0; i < arr3.length; i++) {
+    //       if (arr3[i].length != "") {
+    //         bala2 = arr3.length;
+    //       }
+    //     }
+    //     let total = orders.money / (1 + bala + bala2) / orders.amount;
+    //     nhan_duoc += (total - orders.fee) * 8.64;
+    //   }
+    //   for (let i = 0; i < arr3.length; i++) {
+    //     if (arr1[i] != "") {
+    //       let check1 = kq.includes(arr3[i]);
+    //       let bala = 0;
+    //       for (let i = 0; i < arr1.length; i++) {
+    //         if (arr1[i].length != "") {
+    //           bala = arr1.length;
+    //         }
+    //       }
+    //       if (!check1) {
+    //         let total = orders.money / (arr3.length + bala) / orders.amount;
+    //         nhan_duoc += total * 6.91 - orders.fee;
+    //       }
+    //     }
+    //   }
+    //   await connection.execute(
+    //     "UPDATE `result_k3` SET `get` = ?, `status` = 1 WHERE `id` = ? ",
+    //     [nhan_duoc, id],
+    //   );
+    //   const sql = "UPDATE `users` SET `money` = `money` + ? WHERE `phone` = ? ";
+    //   await connection.execute(sql, [nhan_duoc, phone]);
+    // }
   }
 }
 

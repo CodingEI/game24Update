@@ -1534,6 +1534,8 @@ function initGameLogics({
   $(".Betting__Popup-foot-c").on("click.foot_c", function (e) {
     e.preventDefault();
     bettingPopupClose();
+    $(".van-overlay").hide();
+    $(".van-overlay").css("display", "none");
   });
 
   //main button events
