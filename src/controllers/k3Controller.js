@@ -1504,7 +1504,7 @@ async function funHandingThreeSame(game, join_bet, game_type) {
         }
         // Update bets: minBet gets status = 1, others get status = 2
         for (const bet of bets) {
-          const status = bet.bet === minBet.bet ? 1 : 2;
+          const status = bet.bet === minBet.bet ? 0 : 2;
           await connection.execute(
             `UPDATE result_k3 SET status = ? WHERE status = ? AND game = ? AND join_bet = ? AND typeGame = ? AND bet = ?`,
             [status, 0, game, join_bet, 'three-same', bet.bet]
@@ -1868,17 +1868,15 @@ async function funHandingDifferent(game, join_bet, game_type) {
 
 
 async function plusMoney(game) {
-  
+  console.log("game:---------------->", game)
+
   const [order] = await connection.execute(
     `SELECT id, phone, bet, price, money, fee, amount, result, typeGame FROM result_k3 WHERE status = 0 AND game = ${game} `,
   );
 
-
-  console.log("orders,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,", order);
   for (let i = 0; i < order.length; i++) {
     let orders = order[i];
-    
-    
+  
 
     let phone = orders.phone;
     let id = orders.id;
@@ -2082,11 +2080,8 @@ async function plusMoney(game) {
       await connection.execute(sql, [nhan_duoc, phone]);
     }
 
-
-    console.log("orders", orders)
     nhan_duoc = 0;
     if (orders.typeGame == "three-same") {
-     
       let kq = result;
 
       let array = orders.bet.split("@");
@@ -2119,6 +2114,7 @@ async function plusMoney(game) {
       }
 
       nhan_duoc = orders.money * 2;
+      console.log("nhan_duoc_two==========>", nhan_duoc)
       await connection.execute(
         "UPDATE `result_k3` SET `get` = ?, `status` = ? WHERE `id` = ? ",
         [nhan_duoc , 1, id],
