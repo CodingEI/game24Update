@@ -1004,7 +1004,7 @@ function initGameLogics({
   // --------------------- k3 game logic ---------------------
 
   function displayBetTotalMoney() {
-    console.log("cal1111111111111111111111111111111111")
+    
     let value = parseInt($("#van-field-1-input").val().trim());
     let money = parseInt(
       $(".Betting__Popup-body-line-item.money.bgcolor")
@@ -1021,7 +1021,8 @@ function initGameLogics({
     // $(".van-overlay").css("display", "block");
   }
 
-  // $(".van-overlay").fadeOut();
+  $(".van-overlay").fadeOut();
+  $(".van-overlay").css("display", "block");
   $(".popup-join").fadeOut();
 
   const setBetQuantity = (value) => {
@@ -1357,6 +1358,8 @@ function initGameLogics({
 
   function bettingPopupClose() {
     $("#betting_popup").slideUp();
+ 
+
   }
 
   function handleBettingButton({ value, type }) {
@@ -2084,7 +2087,7 @@ function initGameLogics({
 
       setActiveTab(TAB_NAME_MAP.GAME_HISTORY);
 
-      initGameHistoryTab();
+      initGameHistoryTab(1, activeTab);
     },
   );
 
