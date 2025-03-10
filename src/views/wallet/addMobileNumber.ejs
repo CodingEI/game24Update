@@ -3456,7 +3456,7 @@
           if (mob) {
             const response = await axios({
               method: "POST",
-              url: "/api/webapi/withdraw/<%= platform.toLowerCase() === 'bkash' ? 'add_bkash_mobile' : 'add_nagad_mobile' %>",
+              url: "/api/webapi/<%= platform.toLowerCase() === 'bkash' ? 'add_user_bkash' : 'add_nagad_mobile' %>",
               data: {
                 mobile: mob,
               },

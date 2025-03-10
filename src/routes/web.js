@@ -21,6 +21,7 @@ import vipController from "../controllers/vipController.js";
 import rateLimit from "express-rate-limit";
 import multer from "multer";
 import newTrxWinGoController from "../controllers/newTrxWingoController.js";
+import userWithdrawController from "../controllers/userWithdrawController.js";
 
 let router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
@@ -735,7 +736,56 @@ const initWebRouter = (app) => {
       });
     },
   });
+/***********************************************User Withdraw ********************************** */
+router.get(
+  "/api/webapi/withdraw_user_bank_card",
+  middlewareController,
+  userWithdrawController.getUserbankCardWithdraw,
+); // get
+router.get(
+  "/api/webapi/withdraw_user_bkash",
+  middlewareController,
+  userWithdrawController.getUserBkashWithdraw,
+); // get
+router.get(
+  "/api/webapi/withdraw_user_nagad",
+  middlewareController,
+  userWithdrawController.getUserNagadWithdraw,
+); // get
+router.get(
+  "/api/webapi/withdraw_user_upi",
+  middlewareController,
+  userWithdrawController.getUserUpiWithdraw,
+); // get
 
+
+
+
+router.post(
+  "/api/webapi/add_user_bank_card",
+  middlewareController,
+  userWithdrawController.createUserbankCardWithdraw,
+); // register
+router.post(
+  "/api/webapi/add_user_bkash",
+  middlewareController,
+  userWithdrawController.createUserBkashWithdraw,
+); // register
+router.post(
+  "/api/webapi/add_user_nagad",
+  middlewareController,
+  userWithdrawController.createUserNagadWithdraw,
+); // register
+router.post(
+  "/api/webapi/add_user_upi",
+  middlewareController,
+  userWithdrawController.createUserUPIWithdraw,
+); // register
+
+
+
+
+/**************************************User Withdraw **************************************** */
   router.post(
     "/api/webapi/withdraw/create",
     withdrawalRateLimiter,

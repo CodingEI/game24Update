@@ -4008,7 +4008,7 @@
             url: "/api/webapi/withdraw/bkash_mobile",
           });
 
-          if (response?.data?.account?.isAvailable) {
+          if (!response?.data?.account?.isAvailable) {
             document.querySelector(
               ".addWithdrawType-top[data-v-dc48260d]",
             ).style.height = "2.66667rem";

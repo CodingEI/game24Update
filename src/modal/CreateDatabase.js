@@ -99,6 +99,30 @@ const Admin = async (req, res) => {
   );
 };
 
+const userWithdraw = async (req, res) => {
+  try {
+    console.log("calllllllllllllllllllll")
+    
+   // Reset Help Table
+    await connection.execute("DELETE FROM help_table");
+
+    // Insert Sample Data
+    await connection.execute(
+      `INSERT INTO user_withdraw 
+      (id,phone, nagad,upi,bkash,bankCard status) 
+      VALUES 
+      (NULL,"8687687678","3453454535","35342663546","76723822342",""6767282199, "active")`,
+    );
+
+    res.status(200).json({ message: "User Withdraw Table Reset and Sample Data Inserted" });
+  } catch (error) {
+    console.error("Error resetting User Withdraw Table:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+
 CreateWingo();
 Create5D();
 CreateK3();
+userWithdraw();
