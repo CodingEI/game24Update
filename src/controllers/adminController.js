@@ -2756,6 +2756,32 @@ const updateQrcodeImage = async (req, res, next) => {
   });
 };
 
+// Function to get the user withdrawal details  
+async function getUserWithdrawlData(req, res) {
+  try {
+      const { phone_no } = req.params;
+      
+      // Fetch the user withdrawal details
+      const [user_withdraw_found] = await connection.execute(
+          "SELECT * FROM `users` WHERE `phone` = ? AND `status` = ?",
+          [phone_no, 'active']
+      );
+
+      // Check if any records were found
+      if (user_withdraw_found.length > 0) {
+          // Send the response with the user withdrawal data
+          res.json({ success: true, data: user_withdraw_found[0] });
+      } else {
+          res.status(404).json({ success: false, message: "No active user withdrawal found" });
+      }
+
+  } catch (err) {
+      console.error("Error fetching user withdrawal data:", err.message);
+      res.status(500).json({ success: false, message: "Internal server error" });
+  }
+}
+
+
 const adminController = {
   adminPage,
   adminPage3,
@@ -2818,6 +2844,7 @@ const adminController = {
   getSalary,
   addUserAccountBalance,
   updateQrcodeImage,
+  getUserWithdrawlData
 };
 
 export default adminController;

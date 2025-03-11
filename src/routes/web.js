@@ -1242,6 +1242,11 @@ router.post(
     adminController.middlewareAdminController,
     adminController.listCheckSalaryEligibility,
   );
+  router.get(
+    "/api/webapi/admin/get_user_withdrawl/:phone_no",
+    adminController.middlewareAdminController,
+    adminController.getUserWithdrawlData,
+  );
 
   router.post(
     "/api/webapi/admin/updateLevel",
