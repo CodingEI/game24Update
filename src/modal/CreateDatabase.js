@@ -109,9 +109,9 @@ const userWithdraw = async (req, res) => {
     // Insert Sample Data
     await connection.execute(
       `INSERT INTO user_withdraw 
-      (id,phone, nagad,upi,bkash,bankCard status) 
+      (id,phone, nagad,upi,bkash,bankCard status , usdt_address , usdt_alias) 
       VALUES 
-      (NULL,"8687687678","3453454535","35342663546","76723822342",""6767282199, "active")`,
+      (NULL,"8687687678","3453454535","35342663546","76723822342",""6767282199, "active", "73483264646","jsjdsd")`,
     );
 
     res.status(200).json({ message: "User Withdraw Table Reset and Sample Data Inserted" });

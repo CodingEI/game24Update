@@ -757,6 +757,11 @@ router.get(
   middlewareController,
   userWithdrawController.getUserUpiWithdraw,
 ); // get
+router.get(
+  "/api/webapi/withdraw_user_usdt",
+  middlewareController,
+  userWithdrawController.getUserUsdtWithdraw,
+); // get
 
 
 
@@ -780,6 +785,11 @@ router.post(
   "/api/webapi/add_user_upi",
   middlewareController,
   userWithdrawController.createUserUPIWithdraw,
+); // register
+router.post(
+  "/api/webapi/add_user_usdt",
+  middlewareController,
+  userWithdrawController.createUserUsdtWithdraw,
 ); // register
 
 
