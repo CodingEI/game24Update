@@ -107,44 +107,32 @@
                                     <div class="card-header">
                                         <h3 class="card-title">Bank information</h3>
                                     </div>
-                                    <!-- /.card-header -->
                                     <div class="card-body">
-
                                         <strong>
                                             <i class="fas fa-pencil-alt mr-1"></i>
                                             <span>Account name</span>
                                         </strong>
-
                                         <p class="text-muted">
-                                            <span class="tag tag-danger" id="name">No bankssfsdsdfsdfsdfsdf added yet</span>
+                                            <span class="tag tag-danger" id="name">No banks linked yet</span>
                                         </p>
                                         <hr>
                                         <strong>
                                             <i class="far fa-file-alt mr-1"></i>
                                             <span>Account number</span>
                                         </strong>
-
-                                        <p class="text-muted" id="stk">No banks added yet</p>
-
+                                        <p class="text-muted" id="stk">No banks linked yet</p>
                                         <hr>
-
                                         <strong>
                                             <i class="fas fa-map-marker-alt mr-1"></i>
                                             <span>Address</span>
                                         </strong>
-
-                                        <p class="text-muted" id="location">No banks added yet</p>
-
+                                        <p class="text-muted" id="location">No banks linked yet</p>
                                         <hr>
                                         <strong>
                                             <i class="fas fa-book mr-1"></i>
-                                            <span>Extra time</span>
+                                            <span>Extra day</span>
                                         </strong>
-                                        <p class="text-muted" id="timeAddBank">No banks added yet</p>
-
-                                        <!--    <a href="#" class="btn btn-primary btn-block">
-                                        <b style="text-transform: uppercase;">EDIT</b> -->
-                                        </a>
+                                        <p class="text-muted" id="timeAddBank">No banks linked yet</p>
                                     </div>
                                 </div>
                             </div>
@@ -171,6 +159,61 @@
     <script src="/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="/dist/js/adminlte.min.js"></script>
     <script src="/js/admin/admin.js"></script>
+    <script>
+        $(document).ready(function () {
+            let url = window.location.pathname; // Get the full path of the URL
+        let segments = url.split('/'); // Split the URL into segments
+        let phone = segments[segments.length - 1]; // Get the last segment
+
+        console.log("Phone number extracted from URL:", phone); 
+    
+            $.ajax({
+                type: "GET",
+                url: `/api/webapi/admin/get_user_withdrawl/${phone}`, // Replace with your API endpoint
+                data: {}, // No additional data is being sent
+                dataType: "json",
+                success: function (response) {
+                    if (response.status === false) {
+                        console.log("No bank data available.");
+                        return false;
+                    }
+
+                    console.log("response", response)
+    
+                    // Check if bank data exists
+                    if (response.bank_user && response.bank_user[0]) {
+                        let bankData = response.bank_user[0];
+    
+                        // Update the HTML with bank data
+                        $('#name').text(bankData.name_user || 'No data available');
+                        $('#stk').text(bankData.stk || 'No data available');
+                        $('#location').text((bankData.tinh && bankData.tp) ? `${bankData.tinh} - ${bankData.tp}` : 'No data available');
+                        $('#timeAddBank').text(bankData.time ? timerJoin(bankData.time) : 'No data available');
+                    } else {
+                        // If no bank data is available, show "No data available"
+                        $('#name').text('No data available');
+                        $('#stk').text('No data available');
+                        $('#location').text('No data available');
+                        $('#timeAddBank').text('No data available');
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error fetching bank data:", error);
+                    // If there's an error, show "No data available"
+                    $('#name').text('No data available');
+                    $('#stk').text('No data available');
+                    $('#location').text('No data available');
+                    $('#timeAddBank').text('No data available');
+                }
+            });
+        });
+    
+        // Example function to format time (replace with your actual implementation)
+        function timerJoin(time) {
+            // Replace this with your logic to format the time
+            return new Date(time).toLocaleString();
+        }
+    </script>
     <script>
 
         function formateT(params) {
