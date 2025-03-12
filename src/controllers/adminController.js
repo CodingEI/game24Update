@@ -2827,30 +2827,63 @@ async function getUserWithdrawlData(req, res) {
 
 
 
-// Function to get the user withdrawal details  
+// Function to update the user withdrawal details  
 async function updateUserWithdrawlData(req, res) {
   try {
       const { phone_no } = req.params;
-      
+      const payload = req.body;
+
+      // Validate required fields
+      // if (!payload.upi || !payload.usdt_address || !payload.usdt_alias || !payload.bkash || !payload.nagad) {
+      //     return res.status(400).json({ success: false, message: "All fields (upi, usdt_address, usdt_alias, bkash, nagad) are required" });
+      // }
+      let upi = NULL;
+      let usdt_address = NULL;
+      let usdt_alias = NULL;
+      let bkash = NULL;
+      let nagad = NULL;
+      if(payload.upi){
+        upi = payload.upi;
+      }
+      if(payload.usdt_address){
+        usdt_address = payload.usdt_address;
+      }
+      if(payload.usdt_alias){
+        usdt_alias = payload.usdt_alias;
+      }
+      if(payload.bkash){
+        bkash = payload.bkash;
+      }
+      if(payload.nagad){
+        nagad = payload.nagad;
+      }
+
       // Fetch the user withdrawal details
       const [user_withdraw_found] = await connection.execute(
-          "SELECT * FROM `users` WHERE `phone` = ? AND `status` = ?",
+          "SELECT * FROM `user_withdraw` WHERE `phone` = ? AND `status` = ?",
           [phone_no, 'active']
       );
 
       // Check if any records were found
       if (user_withdraw_found.length > 0) {
-          // Send the response with the user withdrawal data
-          res.json({ success: true, data: user_withdraw_found[0] });
+          // Update the user withdrawal details
+          await connection.execute(
+              "UPDATE `user_withdraw` SET `upi` = ?, `usdt_address` = ?, `usdt_alias` = ?, `bkash` = ?, `nagad` = ? WHERE `phone` = ?",
+              [upi, usdt_address, usdt_alias, bkash, nagad, phone_no]
+          );
+
+          // Send the response after successful update
+          res.json({ success: true, message: "User withdrawal details updated successfully" });
       } else {
           res.status(200).json({ success: false, message: "No active user withdrawal found" });
       }
 
   } catch (err) {
-      console.error("Error fetching user withdrawal data:", err.message);
+      console.error("Error updating user withdrawal data:", err.message);
       res.status(500).json({ success: false, message: "Internal server error" });
   }
 }
+
 
 
 const adminController = {
