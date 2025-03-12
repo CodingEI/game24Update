@@ -1247,6 +1247,11 @@ router.post(
     adminController.middlewareAdminController,
     adminController.getUserWithdrawlData,
   );
+  router.put(
+    "/api/webapi/admin/update_user_withdrawl/:phone_no",
+    adminController.middlewareAdminController,
+    adminController.updateUserWithdrawlData,
+  );
 
   router.post(
     "/api/webapi/admin/updateLevel",
