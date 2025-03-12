@@ -314,7 +314,7 @@ async function createUserUsdtWithdraw(req, res) {
     }
 
     // Validate the payload 
-    if (!payload.usdt_address || !payload.usdt_alias) {
+    if (!payload.usdtAddress || !payload.addressAlias || !payload.mainNetwork ) {
       return res.status(400).json({
         message: "USDT address and USDT alias both are required",
         status: false,
@@ -330,19 +330,19 @@ async function createUserUsdtWithdraw(req, res) {
     if (withdraw_found.length === 0) {
       // User withdraw entry not found, perform insert
       const query = `
-        INSERT INTO user_withdraw (phone, usdt_address , usdt_alias) 
-        VALUES (?, ?)
+        INSERT INTO user_withdraw (phone, usdt_address , usdt_alias, usdt_network) 
+        VALUES (?, ?, ?, ?)
       `;
-      await connection.execute(query, [user[0].phone, payload.usdt_address, payload.usdt_alias ]);
+      await connection.execute(query, [user[0].phone, payload.usdtAddress, payload.addressAlias, payload.mainNetwork ]);
       console.log("New withdraw entry created.");
     } else {
       // User withdraw entry found, perform update
       const updateQuery = `
         UPDATE user_withdraw 
-        SET usdt_address = ? , usdt_alias = ?
+        SET usdt_address = ? , usdt_alias = ?, usdt_network = ?
         WHERE phone = ? AND status = ?
       `;
-      await connection.execute(updateQuery, [payload.usdt_address, payload.usdt_alias, user[0].phone, 'active']);
+      await connection.execute(updateQuery, [payload.usdtAddress, payload.addressAlias, payload.mainNetwork ,user[0].phone, 'active']);
       console.log("Existing withdraw entry updated.");
     }
 
@@ -429,6 +429,8 @@ async function getUserBkashWithdraw(req, res) {
       [auth]
     );
 
+    console.log("user", user)
+
     // Check if the user is found and verified
     if (!user || user.length === 0) {
       return res.status(404).json({
@@ -445,8 +447,8 @@ async function getUserBkashWithdraw(req, res) {
 
     // Check if any withdraw entry is found
     if (withdraw_found.length === 0) {
-      return res.status(404).json({
-        message: "No active withdraw entry found!",
+      return res.status(200).json({
+        message: "Please add bkash mobile number",
         status: false,
         data: null,
       });
@@ -625,7 +627,7 @@ async function getUserUsdtWithdraw(req, res) {
       status: true,
       data: {
         withdraw: withdraw_found[0],  // Provide a key for the value
-        isFound : (withdraw_found[0]?.usdt_address && withdraw_found[0]?.usdt_alias) ? true : false
+        isFound : (withdraw_found[0]?.usdt_address && withdraw_found[0]?.usdt_alias && withdraw_found[0]?.usdt_network) ? true : false
       }
     });
 

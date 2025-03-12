@@ -3503,7 +3503,7 @@
           if (usdtAddress && addressAlias) {
             const response = await axios({
               method: "POST",
-              url: "/api/webapi/withdraw/add_usdt_address",
+              url: "/api/webapi/add_user_usdt",
               data: {
                 mainNetwork: "TRC",
                 usdtAddress,

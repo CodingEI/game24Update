@@ -3959,10 +3959,10 @@
         try {
           const response = await axios({
             method: "GET",
-            url: "/api/webapi/withdraw/usdt_address",
+            url: "/api/webapi/withdraw_user_usdt",
           });
 
-          if (response?.data?.account?.isAvailable) {
+          if (response?.data?.data?.isFound) {
             document.querySelector(
               ".addWithdrawType-top[data-v-dc48260d]",
             ).style.height = "2.66667rem";
@@ -3973,7 +3973,7 @@
                                     USDT Address:
                                 </div>
                                 <div class="account_info_field_value">
-                                    ${response?.data?.account?.usdtAddress}
+                                    ${response?.data?.data?.withdraw?.usdt_address}
                                 </div>
                             </div>
                             <div class="account_info_field">
@@ -3981,7 +3981,7 @@
                                     Address Alias:
                                 </div>
                                 <div class="account_info_field_value">
-                                    ${response?.data?.account?.addressAlias}
+                                    ${response?.data?.data?.withdraw?.usdt_alias}
                                 </div>
                             </div>
                         </div
@@ -4046,7 +4046,7 @@ console.log("responce....", response)
             url: "/api/webapi/withdraw_user_nagad",
           });
 console.log("responce===>", response)
-          if (response?.data?.data?.isFoundrs) {
+          if (response?.data?.data?.isFound) {
             document.querySelector(
               ".addWithdrawType-top[data-v-dc48260d]",
             ).style.height = "2.66667rem";
