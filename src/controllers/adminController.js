@@ -2807,7 +2807,7 @@ async function getUserWithdrawlData(req, res) {
       
       // Fetch the user withdrawal details
       const [user_withdraw_found] = await connection.execute(
-          "SELECT * FROM `users` WHERE `phone` = ? AND `status` = ?",
+          "SELECT * FROM `user_withdraw` WHERE `phone` = ? AND `status` = ?",
           [phone_no, 'active']
       );
 
