@@ -26,26 +26,26 @@ async function createUserUPIWithdraw(req, res) {
     }
 
     // Validate the payload for the Nagad number
-    if (!payload.mobile) {
-      return res.status(400).json({
-        message: "Upi number is required!",
-        status: false,
-      });
-    }
+    // if (!payload.mobile) {
+    //   return res.status(400).json({
+    //     message: "Upi number is required!",
+    //     status: false,
+    //   });
+    // }
 
     // Find if the user already has a withdraw entry
     const [withdraw_found] = await connection.query(
       "SELECT * FROM user_withdraw WHERE phone = ? AND status = ?",
       [user[0].phone, 'active']
     );
-
+console.log("payload", payload.upi)
     if (withdraw_found.length === 0) {
       // User withdraw entry not found, perform insert
       const query = `
         INSERT INTO user_withdraw (phone, upi) 
         VALUES (?, ?)
       `;
-      await connection.execute(query, [user[0].phone, payload.mobile]);
+      await connection.execute(query, [user[0].phone, payload.upi]);
       console.log("New withdraw entry created.");
     } else {
       // User withdraw entry found, perform update
@@ -54,7 +54,7 @@ async function createUserUPIWithdraw(req, res) {
         SET upi = ?
         WHERE phone = ? AND status = ?
       `;
-      await connection.execute(updateQuery, [payload.mobile, user[0].phone, 'active']);
+      await connection.execute(updateQuery, [payload.upi, user[0].phone, 'active']);
       console.log("Existing withdraw entry updated.");
     }
 
@@ -384,7 +384,10 @@ async function getUserBkashWithdraw(req, res) {
     return res.status(200).json({
       message: "User bkash withdraw details fetched successfully!",
       status: true,
-      data: withdraw_found[0],
+      data: {
+        withdraw : withdraw_found[0],
+        isFound : withdraw_found[0]?.bkash ? true:false
+      },
     });
 
   } catch (error) {
@@ -437,7 +440,10 @@ async function getUserNagadWithdraw(req, res) {
     return res.status(200).json({
       message: "User nagad withdraw details fetched successfully!",
       status: true,
-      data: withdraw_found[0],
+      data: {
+        withdraw : withdraw_found[0],
+        isFound : withdraw_found[0].nagad ? true:false
+      },
     });
 
   } catch (error) {
@@ -478,7 +484,7 @@ async function getUserUpiWithdraw(req, res) {
 
     // Check if any withdraw entry is found
     if (withdraw_found.length === 0) {
-      return res.status(404).json({
+      return res.status(400).json({
         message: "No active withdraw entry found!",
         status: false,
         data: null,
@@ -487,9 +493,12 @@ async function getUserUpiWithdraw(req, res) {
 
     // Return the found withdraw entry
     return res.status(200).json({
-      message: "User upi withdraw details fetched successfully!",
+      message: "User UPI withdraw details fetched successfully!",
       status: true,
-      data: withdraw_found[0],
+      data: {
+        withdraw: withdraw_found[0],  // Provide a key for the value
+        isFound : withdraw_found[0]?.upi ? true:false
+      }
     });
 
   } catch (error) {

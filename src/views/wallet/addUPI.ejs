@@ -3453,10 +3453,12 @@
 
           let upi = $("#mobileInput").val().trim();
 
+          console.log("upi", upi)
+
           if (upi) {
             const response = await axios({
               method: "POST",
-              url: "/api/webapi/withdraw/add_user_upi",
+              url: "/api/webapi/add_user_upi",
               data: {
                 upi,
               },

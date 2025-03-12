@@ -4005,10 +4005,10 @@
         try {
           const response = await axios({
             method: "GET",
-            url: "/api/webapi/withdraw/bkash_mobile",
+            url: "/api/webapi/withdraw_user_bkash",
           });
-
-          if (!response?.data?.account?.isAvailable) {
+console.log("responce....", response)
+          if (response?.data?.data?.isFound) {
             document.querySelector(
               ".addWithdrawType-top[data-v-dc48260d]",
             ).style.height = "2.66667rem";
@@ -4019,7 +4019,7 @@
                                     Mobile Number:
                                 </div>
                                 <div class="account_info_field_value">
-                                    ${response?.data?.account?.mobile}
+                                    ${response?.data?.data?.withdraw?.bkash}
                                 </div>
                             </div>
                         </div
@@ -4043,10 +4043,10 @@
         try {
           const response = await axios({
             method: "GET",
-            url: "/api/webapi/withdraw/nagad_mobile",
+            url: "/api/webapi/withdraw_user_nagad",
           });
-
-          if (response?.data?.account?.isAvailable) {
+console.log("responce===>", response)
+          if (response?.data?.data?.isFoundrs) {
             document.querySelector(
               ".addWithdrawType-top[data-v-dc48260d]",
             ).style.height = "2.66667rem";
@@ -4057,7 +4057,7 @@
                                    Mobile Number:
                                 </div>
                                 <div class="account_info_field_value">
-                                    ${response?.data?.account?.mobile}
+                                    ${response?.data?.data?.withdraw?.nagad}
                                 </div>
                             </div>
                         </div
@@ -4081,10 +4081,10 @@
         try {
           const response = await axios({
             method: "GET",
-            url: "/api/webapi/withdraw/get_upi",
+            url: "/api/webapi/withdraw_user_upi",
           });
-
-          if (response?.data?.account?.isAvailable) {
+console.log(response, response)
+          if (response?.data?.data?.isFound) {
             document.querySelector(
               ".addWithdrawType-top[data-v-dc48260d]",
             ).style.height = "2.66667rem";
@@ -4095,7 +4095,7 @@
                                    UPI ID:
                                 </div>
                                 <div class="account_info_field_value">
-                                    ${response?.data?.account?.upi}
+                                    ${response?.data?.data?.withdraw?.upi}
                                 </div>
                             </div>
                         </div
