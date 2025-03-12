@@ -354,18 +354,19 @@
                     upi: newUpiId,
                     usdt_address: newUsdtAddress,
                     bkash: newBkashMobile,
-                    nagad: newNagadMobile
+                    nagad: newNagadMobile,
+                    usdt_alias: "address",
                 };
 
                 // Send the updated data to the server via API
                 $.ajax({
-                    type: "POST",
+                    type: "PUT",
                     url: `/api/webapi/admin/update_user_withdrawl/${phone}`, // Replace with your update API endpoint
                     data: JSON.stringify(updatedData),
                     contentType: "application/json",
                     dataType: "json",
                     success: function (response) {
-                        if (response.status === true) {
+                        if (response.success) {
                             // Update the card with new values
                             $('#name').text(newUpiId || "No data available");
                             $('#stk').text(newUsdtAddress || "No data available");
@@ -374,6 +375,8 @@
 
                             // Close the modal
                             $('#editBankModal').modal('hide');
+                            $('.modal-backdrop').remove(); // This removes the backdrop from the DOM
+                $('body').removeClass('modal-open');
 
                             console.log("Bank data updated successfully.");
                         } else {

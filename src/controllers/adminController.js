@@ -2837,11 +2837,11 @@ async function updateUserWithdrawlData(req, res) {
       // if (!payload.upi || !payload.usdt_address || !payload.usdt_alias || !payload.bkash || !payload.nagad) {
       //     return res.status(400).json({ success: false, message: "All fields (upi, usdt_address, usdt_alias, bkash, nagad) are required" });
       // }
-      let upi = NULL;
-      let usdt_address = NULL;
-      let usdt_alias = NULL;
-      let bkash = NULL;
-      let nagad = NULL;
+      let upi ;
+      let usdt_address ;
+      let usdt_alias ;
+      let bkash ;
+      let nagad;
       if(payload.upi){
         upi = payload.upi;
       }
